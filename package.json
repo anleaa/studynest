@@ -1,0 +1,16 @@
+{
+  "name": "studynest",
+  "version": "1.0.0",
+  "description": "Plataforma web auto-adaptable para productividad y gestion de proyectos academicos.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1"
+  },
+  "author": "StudyNest Team",
+  "license": "ISC"
+}

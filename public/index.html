@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyNest | Tu Nido de Estudio y Productividad Colectiva Real</title>
+  <meta name="description" content="StudyNest centraliza tu vida académica. Organiza tareas, temporizadores Pomodoro y colabora en nidos de estudio conectados en tiempo real directamente a Firebase.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       LANDING PAGE VIEW
+       ========================================================================== -->
+  <div id="landing-view">
+    <!-- Sticky Glassmorphism Navbar -->
+    <nav class="navbar" id="navbar-top">
+      <div class="container navbar-container">
+        <!-- Logo con Isotipo de nido entrelazado realista + hoja en la 'y' -->
+        <a href="#" class="logo" id="main-logo-link">
+          <div class="logo-icon-wrapper">
+            <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="logoBlueGrad" x1="10" y1="50" x2="90" y2="50" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#0ea5e9" />
+                  <stop offset="100%" stop-color="#1e3a8a" />
+                </linearGradient>
+                <linearGradient id="logoTurquoiseGrad" x1="10" y1="50" x2="90" y2="50" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#0d9488" />
+                  <stop offset="100%" stop-color="#3b82f6" />
+                </linearGradient>
+                <linearGradient id="logoLeaf" x1="30" y1="30" x2="70" y2="70" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#06b6d4" />
+                  <stop offset="100%" stop-color="#10b981" />
+                </linearGradient>
+                <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2.5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <!-- Outer Interlocking Circular Ring -->
+              <circle cx="50" cy="50" r="38" stroke="url(#logoBlueGrad)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="140 80" fill="none" opacity="0.85"/>
+              <circle cx="50" cy="50" r="38" stroke="url(#logoTurquoiseGrad)" stroke-width="3" stroke-linecap="round" stroke-dasharray="80 140" transform="rotate(180 50 50)" fill="none" opacity="0.9"/>
+              
+              <!-- Cozy high-tech nest curves at the bottom -->
+              <path d="M 24 55 C 32 72, 68 72, 76 55" stroke="url(#logoBlueGrad)" stroke-width="5" stroke-linecap="round" fill="none"/>
+              <path d="M 18 47 C 28 68, 72 68, 82 47" stroke="url(#logoTurquoiseGrad)" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.8"/>
+              <path d="M 28 62 C 36 76, 64 76, 72 62" stroke="url(#logoBlueGrad)" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95"/>
+              
+              <!-- Central glowing circular light -->
+              <circle cx="50" cy="45" r="9" fill="url(#logoLeaf)" filter="url(#logoGlow)" opacity="0.75"/>
+              
+              <!-- Glowing 4-pointed stars (Academic Success) -->
+              <path d="M 50 35 L 52 39 L 56 40 L 52 41 L 50 45 L 48 41 L 44 40 L 48 39 Z" fill="#ffffff" filter="url(#logoGlow)"/>
+              <path d="M 36 44 L 37.5 47 L 40.5 47.5 L 37.5 48 L 36 51 L 34.5 48 L 31.5 47.5 L 34.5 47 Z" fill="#38bdf8"/>
+              <path d="M 64 44 L 65.5 47 L 68.5 47.5 L 65.5 48 L 64 51 L 62.5 48 L 59.5 47.5 L 62.5 47 Z" fill="#0ea5e9"/>
+              
+              <!-- Small organic leaves integrated into side loops -->
+              <path d="M 18 47 C 12 43, 16 35, 22 37 C 22 37, 20 43, 18 47 Z" fill="url(#logoLeaf)"/>
+              <path d="M 82 47 C 88 43, 84 35, 78 37 C 78 37, 80 43, 82 47 Z" fill="url(#logoLeaf)"/>
+            </svg>
+          </div>
+          <span class="logo-text">
+            <span class="study">Stud<span class="y-with-leaf">y</span></span><span class="nest">Nest</span>
+          </span>
+        </a>
+
+        <!-- Enlaces de navegación interactivos -->
+        <ul class="nav-links">
+          <li><a href="#" onclick="openContentModal('recursos')">Recursos</a></li>
+          <li><a href="#" onclick="openContentModal('funcionamiento')">Funcionamiento</a></li>
+          <li><a href="#" onclick="openContentModal('colaboracion')">Colaboración</a></li>
+          <li><a href="#" onclick="openContentModal('blog')">Blog</a></li>
+        </ul>
+
+        <!-- Botón de CTA Regístrate -->
+        <button class="btn btn-primary" id="btn-navbar-register" onclick="openAuthModal('register')">Regístrate</button>
+      </div>
+    </nav>
+
+    <!-- Sección Hero con mesh gradient -->
+    <section class="hero" id="hero-section">
+      <!-- 3D Floating Ambient Glow Orbs -->
+      <div class="orb-glow orb-glow-1"></div>
+      <div class="orb-glow orb-glow-2"></div>
+      <div class="orb-glow orb-glow-3"></div>
+      
+      <div class="container hero-grid">
+        <!-- Columna Izquierda: Copywriting -->
+        <div class="hero-left" id="hero-copy-container">
+          <h1 id="hero-main-title">“TU POTENCIAL ES INFINITO.<br>ORGANIZA TU MENTE,<br><span class="text-gradient-primary">CONQUISTA TUS SUEÑOS.”</span></h1>
+          <p class="subtext" id="hero-subtext">Bienvenido a StudyNest. Un espacio seguro concebido como un verdadero <strong>Nido de Estudio</strong> digital. Diseñado para ordenar tu día a día y potenciar proyectos grupales reales sin estrés, conectados a la nube.</p>
+          <div class="btn-group" id="hero-cta-buttons">
+            <button class="btn btn-primary" onclick="openAuthModal('register')">Empezar Ahora</button>
+            <button class="btn btn-secondary" onclick="openAuthModal('login')">Iniciar Sesión</button>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Ilustración de Estudiantes -->
+        <div class="hero-right" id="hero-art-container">
+          <svg class="svg-illustration" viewBox="0 -90 500 460" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="glassGrad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#ffffff" stop-opacity="0.65"/>
+                <stop offset="100%" stop-color="#dbeafe" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="blueLineGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#0ea5e9" />
+                <stop offset="100%" stop-color="#1e40af" />
+              </linearGradient>
+              <filter id="illustrationGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            <!-- Floating 3D Laptop Base -->
+            <polygon points="100,240 280,310 440,230 260,160" fill="url(#glassGrad)" stroke="#60a5fa" stroke-width="2.5" opacity="0.95"/>
+            <!-- Bottom shadow -->
+            <polygon points="90,260 280,330 450,245 260,180" fill="#bfdbfe" opacity="0.3" filter="blur(8px)"/>
+            <!-- Front lip thickness -->
+            <polygon points="100,240 280,310 280,316 100,246" fill="#93c5fd" stroke="#60a5fa" stroke-width="1.5"/>
+            <polygon points="280,310 440,230 440,236 280,316" fill="#60a5fa" stroke="#3b82f6" stroke-width="1.5"/>
+            
+            <!-- Backlit Keyboard Grid -->
+            <polygon points="150,205 270,250 390,200 270,160" fill="none" stroke="#93c5fd" stroke-width="1.5" stroke-dasharray="10 4 6 4" opacity="0.45"/>
+            <polygon points="160,212 270,253 380,208 270,172" fill="none" stroke="#60a5fa" stroke-width="1" stroke-dasharray="5 3 8 3" opacity="0.35"/>
+            <polygon points="170,219 270,256 370,216 270,184" fill="none" stroke="#3b82f6" stroke-width="1" stroke-dasharray="4 2 6 2" opacity="0.35"/>
+
+            <!-- Trackpad -->
+            <polygon points="230,268 280,288 310,273 260,253" fill="none" stroke="#93c5fd" stroke-width="1.5"/>
+
+            <!-- 3D Cozy Coffee Mug -->
+            <g transform="translate(10, 0)">
+              <!-- Mug shadow -->
+              <ellipse cx="120" cy="282" rx="10" ry="5" fill="#bfdbfe" opacity="0.5" filter="blur(3px)"/>
+              <!-- Mug handle -->
+              <path d="M 108 252 C 96 252, 96 268, 108 268" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"/>
+              <!-- Mug cylinder -->
+              <path d="M 108 248 L 108 276 A 12 6 0 0 0 132 276 L 132 248 Z" fill="url(#glassGrad)" stroke="#60a5fa" stroke-width="2"/>
+              <!-- Mug top -->
+              <ellipse cx="120" cy="248" rx="12" ry="6" fill="#0ea5e9" stroke="#60a5fa" stroke-width="1.5" opacity="0.4"/>
+              <!-- Steam curls -->
+              <path d="M 116 238 Q 112 228 118 218 T 114 208" fill="none" stroke="#e0f2fe" stroke-width="1.5" stroke-linecap="round" opacity="0.75" filter="url(#illustrationGlow)"/>
+              <path d="M 124 238 Q 120 230 126 222 T 122 214" fill="none" stroke="#93c5fd" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+            </g>
+
+            <!-- Floating Glass Study Book -->
+            <g transform="translate(-10, -5)">
+              <!-- Shadow -->
+              <polygon points="380,290 420,310 460,290 420,270" fill="#bfdbfe" opacity="0.4" filter="blur(4px)"/>
+              <!-- Book Pages (Thickness) -->
+              <polygon points="380,270 420,290 420,295 380,275" fill="#e2e8f0" stroke="#10b981" stroke-width="1"/>
+              <polygon points="420,290 460,270 460,275 420,295" fill="#cbd5e1" stroke="#10b981" stroke-width="1"/>
+              <!-- Book Cover -->
+              <polygon points="380,270 420,290 460,270 420,250" fill="url(#glassGrad)" stroke="#10b981" stroke-width="2"/>
+              <!-- Glowing Book Emblem -->
+              <polygon points="415,268 420,271 425,268 420,265" fill="#34d399" filter="url(#illustrationGlow)" opacity="0.8"/>
+              <!-- Ribbon Bookmark -->
+              <path d="M 420 290 Q 425 305 418 315" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+            </g>
+
+            <!-- Laptop Screen -->
+            <polygon points="260,160 440,230 440,80 260,10" fill="url(#glassGrad)" stroke="#3b82f6" stroke-width="2.5" opacity="0.8"/>
+            <polygon points="265,155 435,221 435,88 265,22" fill="none" stroke="#93c5fd" stroke-width="1.5"/>
+            
+            <!-- Screen Content -->
+            <path d="M 285,50 L 360,80 M 285,62 L 320,76 M 285,74 L 400,120" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="310" cy="115" r="16" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+            <polygon points="306,108 306,122 318,115" fill="#2563eb"/>
+
+            <!-- Rising Interface 1: Cloud Sync (Nube / Base64 uploads) -->
+            <g transform="translate(0, -40)" filter="url(#illustrationGlow)">
+              <polygon points="130,120 220,155 220,75 130,40" fill="url(#glassGrad)" stroke="#0ea5e9" stroke-width="2" opacity="0.95"/>
+              <path d="M 155,90 C 150,90 148,84 153,80 C 150,75 158,68 164,72 C 168,66 178,68 178,74 C 184,74 186,81 181,85 C 185,90 178,94 172,92" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M 160,85 L 165,80 L 170,85 M 165,80 L 165,95" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round"/>
+            </g>
+
+            <!-- Rising Interface 2: Browser Mock Window -->
+            <g transform="translate(140, -110)">
+              <polygon points="220,130 360,185 360,105 220,50" fill="url(#glassGrad)" stroke="#3b82f6" stroke-width="2" opacity="0.95"/>
+              <circle cx="236" cy="74" r="2.5" fill="#ef4444"/>
+              <circle cx="244" cy="77" r="2.5" fill="#f59e0b"/>
+              <circle cx="252" cy="80" r="2.5" fill="#10b981"/>
+              <line x1="230" y1="95" x2="310" y2="127" stroke="#93c5fd" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="230" y1="107" x2="340" y2="151" stroke="#93c5fd" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="230" y1="119" x2="290" y2="143" stroke="#93c5fd" stroke-width="1.5" stroke-linecap="round"/>
+            </g>
+
+            <!-- Rising Interface 3: Kanban Checklist Column -->
+            <g transform="translate(240, -40)">
+              <polygon points="180,200 270,235 270,140 180,105" fill="url(#glassGrad)" stroke="#10b981" stroke-width="2" opacity="0.92"/>
+              <line x1="195" y1="135" x2="245" y2="155" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
+              <polygon points="195,160 203,163 203,155 195,152" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+              <line x1="210" y1="162" x2="255" y2="180" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
+              <polygon points="195,180 203,183 203,175 195,172" fill="#10b981" stroke="#10b981" stroke-width="1.5"/>
+              <line x1="210" y1="182" x2="255" y2="200" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
+            </g>
+
+            <!-- Database cylinder -->
+            <g transform="translate(70, 0)">
+              <ellipse cx="270" cy="180" rx="14" ry="7" fill="url(#glassGrad)" stroke="#0ea5e9" stroke-width="2"/>
+              <path d="M 256,180 L 256,210 A 14 7 0 0 0 284 210 L 284,180" fill="none" stroke="#0ea5e9" stroke-width="2"/>
+              <path d="M 256,195 A 14 7 0 0 0 284 195" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="2,2"/>
+              <path d="M 256,210 A 14 7 0 0 0 284 210" fill="none" stroke="#0ea5e9" stroke-width="2"/>
+            </g>
+
+            <!-- Connection lines -->
+            <path d="M 180,140 Q 220,120 280,140" fill="none" stroke="#60a5fa" stroke-width="2" stroke-dasharray="4,4" stroke-linecap="round"/>
+            <path d="M 220,95 Q 260,70 310,105" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+            <path d="M 330,200 Q 300,230 270,205" fill="none" stroke="#818cf8" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+            <!-- Cozy stars -->
+            <path d="M 120,80 L 123,87 L 130,90 L 123,93 L 120,100 L 117,93 L 110,90 L 117,87 Z" fill="#60a5fa" opacity="0.8" filter="url(#illustrationGlow)"/>
+            <path d="M 390,60 L 392,65 L 397,67 L 392,69 L 390,74 L 388,69 L 383,67 L 388,65 Z" fill="#f59e0b" opacity="0.6"/>
+            <path d="M 310,320 L 311,324 L 315,325 L 311,326 L 310,330 L 309,326 L 305,325 L 309,324 Z" fill="#34d399" opacity="0.7"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- feature cards -->
+    <section class="features-section" id="feature-cards-container">
+      <div class="container features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          </div>
+          <h3>Gestión Académica</h3>
+          <p>Organiza cursos, tareas y plazos de entrega personales en un tablero de estados sumamente intuitivo.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </div>
+          <h3>Aulas Colaborativas</h3>
+          <p>Comparte apuntes de clase, documentos PDF y conversa con tu grupo en los "Nidos" de estudio.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-box">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <h3>Productividad</h3>
+          <p>Maximiza tu concentración diaria con el temporizador Pomodoro digital y bloc de notas autoguardables.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==========================================================================
+       INTERACTIVE NAVBAR CONTENT OVERLAY MODALS
+       ========================================================================== -->
+       
+  <!-- Modal 1: Recursos -->
+  <div class="content-modal" id="modal-recursos">
+    <div class="modal-sheet">
+      <button class="modal-close" onclick="closeContentModal('recursos')">✕</button>
+      <div class="modal-title-header">
+        <h2>Kit de Recursos de Estudio</h2>
+        <p>Herramientas y guías prácticas para optimizar tu aprendizaje diario.</p>
+      </div>
+      
+      <div class="resource-grid">
+        <div class="resource-card">
+          <h4>⏱️ Método Pomodoro (25-5)</h4>
+          <p>Divide tus jornadas en bloques de 25 minutos de enfoque total seguidos por 5 minutos de relajación física o mental. Tras 4 ciclos, toma un descanso largo de 20 minutos.</p>
+        </div>
+        <div class="resource-card">
+          <h4>💡 Técnica de Feynman</h4>
+          <p>Para repasar temas complejos: escríbelo en una hoja explicándolo con palabras tan sencillas como si se lo enseñaras a un niño de 8 años. Detectarás brechas de memoria al instante.</p>
+        </div>
+        <div class="resource-card">
+          <h4>📋 Checklist de Repaso Activo</h4>
+          <p>No releas apuntes pasivamente. Cierra el cuaderno e intenta escribir o recordar todo lo que puedas en una hoja en blanco (Evocación Activa). Es 4 veces más eficaz.</p>
+        </div>
+        <div class="resource-card">
+          <h4>🌱 Organización en Bloques</h4>
+          <p>Agrupa tareas similares (ej: responder correos, hacer resúmenes) en un solo bloque horario. Evita saltar de una actividad a otra para no saturar tu mente.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Funcionamiento -->
+  <div class="content-modal" id="modal-funcionamiento">
+    <div class="modal-sheet">
+      <button class="modal-close" onclick="closeContentModal('funcionamiento')">✕</button>
+      <div class="modal-title-header">
+        <h2>Cómo Funciona StudyNest</h2>
+        <p>Aprende cómo centralizamos la comunicación y el avance grupal en una sola pantalla.</p>
+      </div>
+      
+      <div style="margin-top:20px;">
+        <div class="guide-step">
+          <div class="guide-number">1</div>
+          <div>
+            <strong>Crea tu Nido (Grupo de Trabajo)</strong>
+            <p>Dale nombre a la materia y añade los correos de tus compañeros de clase. Ellos recibirán una invitación directa en sus cuentas.</p>
+          </div>
+        </div>
+        
+        <div class="guide-step">
+          <div class="guide-number">2</div>
+          <div>
+            <strong>Asigna Subtareas con Fechas Límite</strong>
+            <p>Como creador del Nido, desglosa el trabajo y asigna formalmente a cada quien su responsabilidad. Configura una fecha límite tentativa para auditar la entrega.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="guide-number">3</div>
+          <div>
+            <strong>Métrica Colectiva en Tiempo Real</strong>
+            <p>La barra matemática del Nido se actualiza en las pantallas de todos únicamente cuando un integrante sube el archivo correspondiente. Así sabrás quién ha cumplido de un solo vistazo.</p>
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <div class="guide-number">4</div>
+          <div>
+            <strong>Alertas de Presión "Faltas Tú"</strong>
+            <p>Si la fecha tentativa se aproxima y el sistema detecta que no has subido tu parte, el bot de StudyNest te enviará un correo directo y recordatorios al chat grupal automáticamente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Colaboración -->
+  <div class="content-modal" id="modal-colaboracion">
+    <div class="modal-sheet">
+      <button class="modal-close" onclick="closeContentModal('colaboracion')">✕</button>
+      <div class="modal-title-header">
+        <h2>Código de Colaboración Estudiantil</h2>
+        <p>Normas éticas para un desarrollo de proyectos armónico, justo y equitativo.</p>
+      </div>
+      
+      <div style="margin-top:20px; color:var(--color-text-secondary); font-size:15px; display:flex; flex-direction:column; gap:16px;">
+        <p>🤝 <strong>Responsabilidad Compartida:</strong> En un Nido de Estudio, el éxito de uno es el éxito de todos. Comprométete a entregar tus asignaciones en el plazo previsto para evitar retrasar el flujo de tus compañeros.</p>
+        <p>📢 <strong>Comunicación Transparente:</strong> Si experimentas dificultades técnicas, problemas familiares o bloqueos mentales, notifícalo a tu Nido de inmediato a través del Chat Grupal. La empatía grupal nace de la honestidad.</p>
+        <p>🎨 <strong>Respeto y Feedback Constructivo:</strong> Al revisar los borradores o archivos compartidos por tus compañeros, ofrece críticas constructivas con amabilidad. Fomenta un ambiente de coworking seguro y motivador.</p>
+        <p>⚖️ <strong>Reparto Equitativo:</strong> Utiliza el tablero de desglose del administrador para asegurar que el volumen y peso de las subtareas se distribuya justamente acorde a las capacidades y tiempos de cada miembro.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Blog -->
+  <div class="content-modal" id="modal-blog">
+    <div class="modal-sheet">
+      <button class="modal-close" onclick="closeContentModal('blog')">✕</button>
+      <div class="modal-title-header">
+        <h2>Blog de Productividad Académica</h2>
+        <p>Lecturas recomendadas para mantener tu mente oxigenada y vencer la postergación.</p>
+      </div>
+      
+      <div style="margin-top:24px;">
+        <div class="blog-post">
+          <h4>Vencer la Saturación Mental en Época de Exámenes</h4>
+          <div class="blog-meta">Publicado por el Equipo StudyNest • 24 de Mayo, 2026</div>
+          <p style="color:var(--color-text-secondary); font-size:14px;">El cerebro humano no es una máquina de almacenamiento infinito. Forzar jornadas de estudio de 10 horas seguidas sin pausas genera un desgaste cognitivo severo y reduce la retención a largo plazo. Aprende a aplicar micro-descansos de 5 minutos al aire libre y a estructurar tus temas en mapas de calor para estudiar de forma inteligente y descansada.</p>
+        </div>
+        
+        <div class="blog-post">
+          <h4>El Impacto del Co-working Digital y el Aprendizaje Grupal</h4>
+          <div class="blog-meta">Publicado por Dr. Rodrigo Silva • 18 de Mayo, 2026</div>
+          <p style="color:var(--color-text-secondary); font-size:14px;">Estudios recientes confirman que los estudiantes que desglosan sus trabajos académicos en subtareas públicas compartidas logran hasta un 45% más de rendimiento y notas sobresalientes comparado con grupos que trabajan de forma aislada. La transparencia grupal reduce la desidia y estimula el apoyo mutuo en redes colaborativas.</p>
+        </div>
+
+        <div class="blog-post">
+          <h4>Cómo Estructurar una Agenda de Estudio Efectiva</h4>
+          <div class="blog-meta">Publicado por Sofía Martínez • 12 de Mayo, 2026</div>
+          <p style="color:var(--color-text-secondary); font-size:14px;">Una agenda no es solo una lista interminable de tareas pendientes. El secreto de la productividad universitaria radica en calendarizar bloques específicos no solo para estudiar, sino para descansar y disfrutar. Si no asignas bloques horarios a tu descanso, tu mente terminará tomándolos de forma involuntaria mediante la postergación.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       AUTHENTICATION OVERLAY MODALS
+       ========================================================================== -->
+  <div class="auth-overlay" id="auth-modal">
+    <div class="auth-card" id="auth-panel-container">
+      <button class="auth-close" onclick="closeAuthModal()">✕</button>
+      
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login-trigger" onclick="switchAuthTab('login')">Ingresar</button>
+        <button class="auth-tab" id="tab-register-trigger" onclick="switchAuthTab('register')">Registrarse</button>
+      </div>
+
+      <!-- Login Form -->
+      <form class="auth-form" id="form-login" onsubmit="event.preventDefault(); submitAuth('login');">
+        <div class="form-group">
+          <label for="login-email">Correo Universitario</label>
+          <input type="email" id="login-email" required placeholder="ejemplo@student.edu">
+        </div>
+        <div class="form-group">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label for="login-password">Contraseña</label>
+            <a href="#" onclick="switchAuthTab('forgot')" style="font-size: 11px; color: var(--color-turquoise); text-decoration: none; font-weight: 600;">¿Olvidaste tu clave?</a>
+          </div>
+          <input type="password" id="login-password" required placeholder="••••••••">
+        </div>
+        <div class="auth-error" id="login-error-msg">Credenciales incorrectas. Intenta de nuevo.</div>
+        <button class="btn btn-primary" type="submit" style="width:100%; margin-top:10px;">Entrar a StudyNest</button>
+      </form>
+
+      <!-- Register Form -->
+      <form class="auth-form" id="form-register" style="display:none;" onsubmit="event.preventDefault(); submitAuth('register');">
+        <div class="form-group">
+          <label for="reg-name">Nombre Completo</label>
+          <input type="text" id="reg-name" required placeholder="Carlos Rosales">
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Correo Universitario</label>
+          <input type="email" id="reg-email" required placeholder="carlos@student.edu">
+        </div>
+        <div class="form-group">
+          <label for="reg-password">Contraseña</label>
+          <input type="password" id="reg-password" required placeholder="Crear contraseña (mínimo 6 caracteres)">
+        </div>
+        <div class="auth-error" id="reg-error-msg"></div>
+        <button class="btn btn-primary" type="submit" style="width:100%; margin-top:10px;">Crear Cuenta</button>
+      </form>
+
+      <!-- Recover Password Form -->
+      <form class="auth-form" id="form-forgot-password" style="display:none;" onsubmit="event.preventDefault(); submitForgotPassword();">
+        <div class="form-group">
+          <label for="forgot-email">Correo Universitario</label>
+          <input type="email" id="forgot-email" required placeholder="ejemplo@student.edu">
+        </div>
+        <div class="auth-error" id="forgot-error-msg" style="display: none; color: #dc2626; font-size: 13px;"></div>
+        <div id="forgot-success-msg" style="display: none; color: #0d9488; font-size: 13px; font-weight: 600; text-align: center; margin-top: 5px;">Se ha enviado un correo para restablecer tu contraseña.</div>
+        <button class="btn btn-primary" type="submit" style="width:100%; margin-top:10px;">Restablecer Contraseña</button>
+        <button class="btn btn-secondary" type="button" onclick="switchAuthTab('login')" style="width:100%; margin-top:8px;">Volver a Ingresar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       STUDENT WORKSPACE PANEL (HIDDEN BY DEFAULT)
+       ========================================================================== -->
+  <div id="app-view">
+    <!-- Sidebar de Navegación -->
+    <aside class="sidebar" id="app-sidebar-nav">
+      <div class="sidebar-logo">
+        <a href="#" class="logo" style="pointer-events:none;">
+          <div class="logo-icon-wrapper" style="transform: scale(0.85); transform-origin: left center;">
+            <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="sb-logoBlueGrad" x1="10" y1="50" x2="90" y2="50" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#0ea5e9" />
+                  <stop offset="100%" stop-color="#1e3a8a" />
+                </linearGradient>
+                <linearGradient id="sb-logoTurquoiseGrad" x1="10" y1="50" x2="90" y2="50" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#0d9488" />
+                  <stop offset="100%" stop-color="#3b82f6" />
+                </linearGradient>
+                <linearGradient id="sb-logoLeaf" x1="30" y1="30" x2="70" y2="70" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#06b6d4" />
+                  <stop offset="100%" stop-color="#10b981" />
+                </linearGradient>
+                <filter id="sb-logoGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2.5" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <!-- Outer Interlocking Circular Ring -->
+              <circle cx="50" cy="50" r="38" stroke="url(#sb-logoBlueGrad)" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="140 80" fill="none" opacity="0.85"/>
+              <circle cx="50" cy="50" r="38" stroke="url(#sb-logoTurquoiseGrad)" stroke-width="3" stroke-linecap="round" stroke-dasharray="80 140" transform="rotate(180 50 50)" fill="none" opacity="0.9"/>
+              
+              <!-- Cozy high-tech nest curves at the bottom -->
+              <path d="M 24 55 C 32 72, 68 72, 76 55" stroke="url(#sb-logoBlueGrad)" stroke-width="5" stroke-linecap="round" fill="none"/>
+              <path d="M 18 47 C 28 68, 72 68, 82 47" stroke="url(#sb-logoTurquoiseGrad)" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.8"/>
+              <path d="M 28 62 C 36 76, 64 76, 72 62" stroke="url(#sb-logoBlueGrad)" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95"/>
+              
+              <!-- Central glowing circular light -->
+              <circle cx="50" cy="45" r="9" fill="url(#sb-logoLeaf)" filter="url(#sb-logoGlow)" opacity="0.75"/>
+              
+              <!-- Glowing 4-pointed stars (Academic Success) -->
+              <path d="M 50 35 L 52 39 L 56 40 L 52 41 L 50 45 L 48 41 L 44 40 L 48 39 Z" fill="#ffffff" filter="url(#sb-logoGlow)"/>
+              <path d="M 36 44 L 37.5 47 L 40.5 47.5 L 37.5 48 L 36 51 L 34.5 48 L 31.5 47.5 L 34.5 47 Z" fill="#38bdf8"/>
+              <path d="M 64 44 L 65.5 47 L 68.5 47.5 L 65.5 48 L 64 51 L 62.5 48 L 59.5 47.5 L 62.5 47 Z" fill="#0ea5e9"/>
+              
+              <!-- Small organic leaves integrated into side loops -->
+              <path d="M 18 47 C 12 43, 16 35, 22 37 C 22 37, 20 43, 18 47 Z" fill="url(#sb-logoLeaf)"/>
+              <path d="M 82 47 C 88 43, 84 35, 78 37 C 78 37, 80 43, 82 47 Z" fill="url(#sb-logoLeaf)"/>
+            </svg>
+          </div>
+          <span class="logo-text">
+            <span class="study">Stud<span class="y-with-leaf">y</span></span><span class="nest">Nest</span>
+          </span>
+        </a>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li class="sidebar-menu-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+          <a href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+            Dashboard
+          </a>
+        </li>
+        <li class="sidebar-menu-item" data-tab="productivity" onclick="switchTab('productivity')">
+          <a href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Productividad
+          </a>
+        </li>
+        <li class="sidebar-menu-item" data-tab="nidos" onclick="switchTab('nidos')">
+          <a href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Mis Nidos (Grupos)
+          </a>
+        </li>
+        <li class="sidebar-menu-item" data-tab="alerts" onclick="switchTab('alerts'); markAllNotificationsAsRead();">
+          <a href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Alertas y Correos
+          </a>
+        </li>
+      </ul>
+
+      <!-- Cuenta de Usuario -->
+      <div class="sidebar-user" id="user-drawer-profile">
+        <div class="user-info">
+          <span class="user-name" id="profile-user-name">Estudiante</span>
+          <span class="user-email" id="profile-user-email">carlos@student.edu</span>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()" title="Cerrar Sesión" style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; outline: none; border: none; background: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Contenedor Workspace -->
+    <main class="app-workspace">
+      <!-- Encabezado de la App -->
+      <header class="app-header">
+        <div class="header-title">
+          <h2 id="current-tab-title">Mi Nido de Estudio</h2>
+        </div>
+        
+        <div class="header-actions">
+          <div class="notif-badge-wrapper" onclick="switchTab('alerts'); markAllNotificationsAsRead();" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background-color: var(--color-bg-base); border: 1px solid var(--color-border); transition: var(--transition-fast); position: relative;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <div class="notif-badge" id="unread-notif-badge" style="display:none; top: -2px; right: -2px;">0</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Contenidos Dinámicos (TABS) -->
+      <div class="app-content">
+
+        <!-- ==========================================
+             TAB 1: GENERAL DASHBOARD OVERVIEW
+             ========================================== -->
+        <div class="glass-panel-content" id="panel-dashboard">
+          <div class="dashboard-grid">
+            <!-- Columna Izquierda: Nidos activos -->
+            <div>
+              <div class="glass-panel">
+                <div class="panel-header">
+                  <h3>Mis Nidos Colaborativos en la Nube</h3>
+                  <div style="display:flex; gap:8px;">
+                    <button class="btn btn-secondary" onclick="openJoinNidoModal()" style="padding:6px 14px; font-size:12px;">Unirse por Código</button>
+                    <button class="btn btn-primary" onclick="openCreateNidoModal()" style="padding:6px 14px; font-size:12px;">+ Crear Nuevo Nido</button>
+                  </div>
+                </div>
+                <div id="dashboard-active-nidos">
+                  <!-- Carga dinámica de Nidos -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Columna Derecha: Alertas de Control & Global Chat -->
+            <div>
+              <div class="glass-panel">
+                <h3>Controles Próximos</h3>
+                <div id="upcoming-deadlines-list" style="margin-top:12px;">
+                  <!-- Lista dinámica -->
+                </div>
+              </div>
+
+              <!-- Chat Global Universitario -->
+              <div class="glass-panel" style="padding:0; overflow:hidden; display:flex; flex-direction:column; min-height:334px; justify-content:center;" id="global-chat-container">
+                
+                <!-- PLACEHOLDER / ACCESO AL CHAT -->
+                <div id="global-chat-placeholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px; text-align:center; gap:16px; flex-grow:1;">
+                  <div class="avatar-circle" style="width:60px; height:60px; background-color: var(--color-turquoise-light); color: var(--color-turquoise); border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  </div>
+                  <div>
+                    <strong style="font-size:16px; display:block; color: var(--color-text-primary); font-family: var(--font-title);">Chat General Universitario</strong>
+                    <span style="font-size:12px; color:var(--color-text-secondary); display:block; margin-top:4px;">Conéctate y comparte con estudiantes de toda la universidad.</span>
+                  </div>
+                  <button class="btn btn-primary" onclick="connectAndEnterGlobalChat()" style="padding:8px 24px; font-size:13px; margin-top:8px;">Entrar al chat</button>
+                </div>
+
+                <!-- CHAT VIEW (HIDDEN BY DEFAULT) -->
+                <div id="global-chat-active-view" style="display:none; flex-direction:column; flex-grow:1; height: 100%;">
+                  <div class="chat-header" style="border-bottom: 1px solid var(--color-border); display:flex; align-items:center; gap:12px; padding: 12px 16px;">
+                    <div class="avatar-circle" style="background-color: var(--color-turquoise-light); color: var(--color-turquoise);">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    </div>
+                    <div>
+                      <strong style="font-size:14px; display:block; color: var(--color-text-primary);">Chat General Universitario</strong>
+                      <span style="font-size:11px; color:var(--color-emerald); font-weight: 600;">Conectado en tiempo real</span>
+                    </div>
+                  </div>
+                  <div class="chat-messages" id="global-chat-messages" style="height:200px;">
+                    <!-- Mensajes -->
+                  </div>
+                  <div class="chat-input-bar" style="padding:10px 16px; border-top: 1px solid var(--color-border);">
+                    <input type="text" class="chat-input-field" id="global-chat-text-input" placeholder="Comenta algo en general..." onkeydown="if(event.key==='Enter') sendGlobalChatMessage()">
+                    <button class="btn btn-primary" onclick="sendGlobalChatMessage()" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(45deg);"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 2: PRODUCTIVIDAD INDIVIDUAL
+             ========================================== -->
+        <div class="glass-panel-content" id="panel-productivity" style="display:none;">
+          <div class="productivity-layout">
+            <!-- Kanban Board -->
+            <div class="glass-panel">
+              <div class="panel-header">
+                <h3>Tablero de Estados de Actividades</h3>
+                <button class="btn btn-primary" onclick="triggerAddNewKanbanTaskModal()" style="padding:6px 12px; font-size:12px;">+ Nueva Actividad</button>
+              </div>
+              
+              <div class="kanban-board">
+                <div class="kanban-col">
+                  <div class="kanban-col-title">
+                    <span>Pendientes</span>
+                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:var(--color-text-muted); margin-left:6px;"></span>
+                  </div>
+                  <div class="task-list" id="col-pending" ondragover="event.preventDefault();" ondrop="handleTaskDrop(event, 'pending')"></div>
+                </div>
+
+                <div class="kanban-col">
+                  <div class="kanban-col-title">
+                    <span>En Progreso</span>
+                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:var(--color-turquoise); margin-left:6px;"></span>
+                  </div>
+                  <div class="task-list" id="col-progress" ondragover="event.preventDefault();" ondrop="handleTaskDrop(event, 'in-progress')"></div>
+                </div>
+
+                <div class="kanban-col">
+                  <div class="kanban-col-title">
+                    <span>Completadas</span>
+                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:var(--color-emerald); margin-left:6px;"></span>
+                  </div>
+                  <div class="task-list" id="col-completed" ondragover="event.preventDefault();" ondrop="handleTaskDrop(event, 'completed')"></div>
+                </div>
+              </div>
+              <p style="font-size:11px; color:var(--color-text-muted); margin-top:14px; text-align:center;">Tip: Haz clic en una actividad para cambiar su columna rápidamente (ideal para móviles y laptops).</p>
+            </div>
+
+            <!-- Columna Derecha: Pomodoro & Notas -->
+            <div>
+              <div class="glass-panel" style="padding:20px;">
+                <h3 style="text-align:center; font-size:16px;">Temporizador de Enfoque Pomodoro</h3>
+                <div class="pomodoro-container">
+                  <div class="pomo-circle" id="pomo-circle">
+                    <span class="pomo-time" id="pomo-time-display">25:00</span>
+                    <span class="pomo-label" id="pomo-mode-label">Enfoque Activo</span>
+                  </div>
+                  <div class="pomo-controls">
+                    <button class="pomo-btn" id="pomo-play" title="Iniciar/Pausar" style="font-size: 0; padding: 0;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <button class="pomo-btn" id="pomo-reset" title="Reiniciar" style="font-size: 0; padding: 0;">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="glass-panel">
+                <h3>Bloc de Notas Rápidas</h3>
+                <p style="font-size:11px; color:var(--color-text-muted); margin-bottom:10px;">Tus ideas se guardan al escribir.</p>
+                <textarea class="notepad-area" id="quick-notes-pad" placeholder="Escribe tus borradores de apuntes aquí..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             TAB 3: GROUP WORKSPACES ("NIDOS")
+             ========================================== -->
+        <div class="glass-panel-content" id="panel-nidos" style="display:none;">
+          <!-- Cargado dinámicamente -->
+        </div>
+
+        <!-- ==========================================
+             TAB 4: ALERTA Y CORREO LOG VIEWER
+             ========================================== -->
+        <div class="glass-panel-content" id="panel-alerts" style="display:none;">
+          <div class="glass-panel" style="max-width: 800px; margin: 0 auto;">
+            <h3>Historial de Alertas Inteligentes</h3>
+            <p style="font-size:13px; color:var(--color-text-secondary); margin-bottom:20px;">Notificaciones automáticas y alertas de presión enviadas por el bot de StudyNest.</p>
+            <div id="panel-alerts-list">
+              <!-- Lista dinámica -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       VIRTUAL CLASSMATES CLASSROOM SIMULATION FLOAT WIDGET
+       ========================================================================== -->
+  <div class="simulator-widget" id="simulator-floating-widget">
+    <button class="simulator-toggle-btn" onclick="toggleSimulatorPanel()" title="Simulador de Compañeros" style="display: flex; align-items: center; justify-content: center;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    </button>
+    
+    <div class="simulator-panel" id="sim-control-panel">
+      <div class="sim-header">
+        <span>Simulador de Compañeros</span>
+        <button style="background:none; border:none; cursor:pointer;" onclick="toggleSimulatorPanel()">✕</button>
+      </div>
+      <p style="font-size:11px; color:var(--color-text-secondary); margin-top:2px;">Dispara acciones de tus compañeros de Nido (Lucía, Sofía, Juan) para ver el progreso y las alertas en tiempo real:</p>
+      
+      <div class="sim-actions-list">
+        <button class="sim-action-btn" onclick="runClassmateSimulationAction('lucia-chat')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-turquoise); flex-shrink: 0;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <div>
+            <strong>Lucía envía Apuntes</strong>
+            <div style="font-size:10px; color:var(--color-text-muted);">Envía foto y texto al chat grupal</div>
+          </div>
+        </button>
+        
+        <button class="sim-action-btn" onclick="runClassmateSimulationAction('sofia-task')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-emerald); flex-shrink: 0;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <div>
+            <strong>Sofía sube Marco Teórico</strong>
+            <div style="font-size:10px; color:var(--color-text-muted);">Completa subtarea cargando PDF</div>
+          </div>
+        </button>
+        
+        <button class="sim-action-btn" onclick="runClassmateSimulationAction('juan-complain')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-turquoise); flex-shrink: 0;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <div>
+            <strong>Juan avisa retraso</strong>
+            <div style="font-size:10px; color:var(--color-text-muted);">Envía mensaje por fallas de internet</div>
+          </div>
+        </button>
+
+        <button class="sim-action-btn" onclick="runClassmateSimulationAction('juan-task')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-gold); flex-shrink: 0;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a5 5 0 0 0-5 5v3c0 2.21 1.79 4 4 4h2a4 4 0 0 0 4-4V7a4 4 0 0 0-4-5h-1z"></path></svg>
+          <div>
+            <strong>Juan sube Conclusiones</strong>
+            <div style="font-size:10px; color:var(--color-text-muted);">Leva el progreso general al 100%</div>
+          </div>
+        </button>
+        
+        <button class="sim-action-btn" onclick="runClassmateSimulationAction('trigger-alerts')" style="border-color:#fee2e2; background-color:#fff5f5; color:#dc2626;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #dc2626; flex-shrink: 0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <div>
+            <strong>Forzar "Alerta Faltas Tú"</strong>
+            <div style="font-size:10px; color:#ef4444;">Vence tentativa y avisa a rezagados</div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Bar -->
+  <div class="toast-container" id="toast-box"></div>
+
+  <!-- ==========================================================================
+       INLINE MODAL WRAPPERS & SCRIPTS
+       ========================================================================== -->
+  <script>
+    // Navbar Content Modals Show/Hide
+    function openContentModal(type) {
+      // Close all modals first
+      closeAllContentModals();
+      const modal = document.getElementById(`modal-${type}`);
+      if (modal) modal.classList.add('active');
+    }
+    function closeContentModal(type) {
+      const modal = document.getElementById(`modal-${type}`);
+      if (modal) modal.classList.remove('active');
+    }
+    function closeAllContentModals() {
+      document.querySelectorAll('.content-modal').forEach(m => m.classList.remove('active'));
+    }
+
+    // Popup Auth Modal Show/Hide
+    function openAuthModal(type = 'login') {
+      const modal = document.getElementById('auth-modal');
+      modal.classList.add('active');
+      switchAuthTab(type);
+    }
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.remove('active');
+    }
+    function switchAuthTab(type) {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('form-login').style.display = 'none';
+      document.getElementById('form-register').style.display = 'none';
+      document.getElementById('form-forgot-password').style.display = 'none';
+
+      if (type === 'login') {
+        document.getElementById('tab-login-trigger').classList.add('active');
+        document.getElementById('form-login').style.display = 'flex';
+      } else if (type === 'register') {
+        document.getElementById('tab-register-trigger').classList.add('active');
+        document.getElementById('form-register').style.display = 'flex';
+      } else if (type === 'forgot') {
+        document.getElementById('form-forgot-password').style.display = 'flex';
+      }
+    }
+    
+    // Auth Form submission router
+    function submitAuth(type) {
+      if (type === 'login') {
+        const email = document.getElementById('login-email').value;
+        const pass = document.getElementById('login-password').value;
+        handleLogin(email, pass).then(closeAuthModal).catch(err => {
+          const errBox = document.getElementById('login-error-msg');
+          errBox.innerText = err.message;
+          errBox.style.display = 'block';
+        });
+      } else {
+        const name = document.getElementById('reg-name').value;
+        const email = document.getElementById('reg-email').value;
+        const pass = document.getElementById('reg-password').value;
+        handleRegister(name, email, pass).then(closeAuthModal).catch(err => {
+          const errBox = document.getElementById('reg-error-msg');
+          errBox.innerText = err.message;
+          errBox.style.display = 'block';
+        });
+      }
+    }
+
+    function submitForgotPassword() {
+      const email = document.getElementById('forgot-email').value;
+      const errorBox = document.getElementById('forgot-error-msg');
+      const successBox = document.getElementById('forgot-success-msg');
+      errorBox.style.display = 'none';
+      successBox.style.display = 'none';
+      
+      handleForgotPassword(email).then(() => {
+        successBox.style.display = 'block';
+      }).catch(err => {
+        errorBox.innerText = err.message;
+        errorBox.style.display = 'block';
+      });
+    }
+
+
+    function copyCreatedNidoCode() {
+      if (typeof lastCreatedNidoCode !== 'undefined' && lastCreatedNidoCode) {
+        copyNidoCode(lastCreatedNidoCode);
+      }
+    }
+
+    // Kanban tasks are now added via custom HTML modal forms in app.js
+
+    // Drag-Drop Kanban event handlers
+    function handleTaskDrop(event, targetStatus) {
+      event.preventDefault();
+      const id = event.dataTransfer.getData('text/plain');
+      const task = state.personalTasks.find(t => t.id === id);
+      if (task) {
+        task.status = targetStatus;
+        saveLocalState();
+        renderKanban();
+        showToast('Actividad Movida', `Actualizada al estatus: ${targetStatus === 'in-progress' ? 'En Progreso' : targetStatus === 'completed' ? 'Completada' : 'Pendiente'}`);
+      }
+    }
+
+    window.addEventListener('dragover', (e) => e.preventDefault());
+  </script>
+
+  <!-- ==========================================================================
+       PREMIUM COZY INTERACTIVE MODAL FORMS (REPLACING NATIVE PROMPTS)
+       ========================================================================== -->
+
+  <!-- Modal: Crear Nido -->
+  <div class="content-modal" id="modal-create-nido">
+    <div class="modal-sheet" style="max-width: 520px;">
+      <button class="modal-close" onclick="closeModalForm('create-nido')">✕</button>
+      <div class="modal-title-header">
+        <h2 style="font-size: 24px; color: var(--color-emerald); display: flex; align-items: center; gap: 10px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Crear Nuevo Nido
+        </h2>
+        <p>Inicia una red de apoyo y coworking digital con tus compañeros.</p>
+      </div>
+      
+      <form id="form-create-nido" onsubmit="event.preventDefault(); submitCreateNidoForm();" class="auth-form" style="gap: 20px;">
+        <div class="form-group">
+          <label for="nido-name-input">Nombre del Proyecto o Grupo</label>
+          <input type="text" id="nido-name-input" required placeholder="Ej: Laboratorio de Física Mecánica">
+        </div>
+        <div class="form-group">
+          <label for="nido-subject-input">Materia o Asignatura</label>
+          <input type="text" id="nido-subject-input" required placeholder="Ej: Física I">
+        </div>
+        <div class="form-group">
+          <label for="nido-deadline-input">Fecha Tentativa de Entrega</label>
+          <input type="date" id="nido-deadline-input" required>
+        </div>
+        <div class="form-group">
+          <label for="nido-members-input">Invitar Compañeros (Correos separados por coma, opcional)</label>
+          <textarea id="nido-members-input" placeholder="lucia@student.edu, sofia@student.edu, juan@student.edu" style="min-height: 80px; padding: 12px; border-radius: var(--radius-sm); border: 1px solid rgba(120,53,4,0.25); outline: none; font-size:14px; resize: none;"></textarea>
+        </div>
+        <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 10px;">Crear Nido de Estudio</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Unirse a Nido por Código -->
+  <div class="content-modal" id="modal-join-nido">
+    <div class="modal-sheet" style="max-width: 480px;">
+      <button class="modal-close" onclick="closeModalForm('join-nido')">✕</button>
+      <div class="modal-title-header">
+        <h2 style="font-size: 24px; color: var(--color-emerald); display: flex; align-items: center; gap: 10px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6"/><path d="M10 14L21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+          Unirse a un Nido
+        </h2>
+        <p>Introduce el código corto aleatorio del Nido para unirte al instante.</p>
+      </div>
+      
+      <form id="form-join-nido" onsubmit="event.preventDefault(); submitJoinNidoForm();" class="auth-form" style="gap: 20px;">
+        <div class="form-group" style="text-align: center;">
+          <label for="nido-code-input" style="font-weight: 600; font-size: 13px; margin-bottom: 8px; display: block; text-align: left;">Código de Acceso (6 caracteres)</label>
+          <input type="text" id="nido-code-input" class="nido-code-input-field" required maxlength="6" placeholder="G8T2YP" style="width: 100%; padding: 12px; border: 2px solid var(--color-border); border-radius: var(--radius-sm); outline: none; transition: border-color var(--transition-fast);">
+        </div>
+        <div class="auth-error" id="join-nido-error-msg" style="color: #dc2626; font-size: 13px; margin-top: -10px; text-align: center;">El código ingresado no corresponde a ningún Nido activo.</div>
+        <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 10px;">Unirse al Nido</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Nido Creado Exitosamente (Muestra el Código para compartir) -->
+  <div class="content-modal" id="modal-nido-created-success">
+    <div class="modal-sheet" style="max-width: 450px; text-align: center;">
+      <button class="modal-close" onclick="closeModalForm('nido-created-success')">✕</button>
+      <div class="modal-title-header">
+        <h2 style="font-size: 24px; color: var(--color-emerald);">¡Nido Creado con Éxito!</h2>
+        <p>Tu espacio de coworking digital ya está listo.</p>
+      </div>
+      
+      <div style="margin: 24px 0; padding: 20px; background: rgba(14, 165, 233, 0.08); border-radius: var(--radius-sm); border: 1px dashed rgba(14, 165, 233, 0.3);">
+        <span style="font-size: 13px; color: var(--color-text-secondary); display: block; margin-bottom: 8px; font-weight: 600;">CÓDIGO DE ACCESO DEL GRUPO</span>
+        <div id="created-nido-code-display" style="font-family: 'Courier New', Courier, monospace; font-size: 36px; font-weight: 800; color: var(--color-emerald); letter-spacing: 4px; margin-bottom: 12px; text-shadow: 0 2px 10px rgba(15, 76, 129, 0.1);">ABCDEF</div>
+        <button class="btn btn-primary" onclick="copyCreatedNidoCode()" style="padding: 8px 18px; font-size: 13px;">Copiar Código</button>
+      </div>
+      <p style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 20px;">Comparte este código con tus compañeros de clase para que puedan unirse al instante desde su dashboard.</p>
+      <button class="btn btn-secondary" onclick="closeModalForm('nido-created-success')" style="width: 100%;">Ir a mis Nidos</button>
+    </div>
+  </div>
+
+  <!-- Modal: Crear Kanban Task -->
+  <div class="content-modal" id="modal-create-kanban-task">
+    <div class="modal-sheet" style="max-width: 500px;">
+      <button class="modal-close" onclick="closeModalForm('create-kanban-task')">✕</button>
+      <div class="modal-title-header">
+        <h2 style="font-size: 24px; color: var(--color-emerald); display: flex; align-items: center; gap: 10px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+          Nueva Actividad Personal
+        </h2>
+        <p>Añade una tarea a tu tablero Kanban individual para organizar tu día.</p>
+      </div>
+      
+      <form id="form-create-kanban-task" onsubmit="event.preventDefault(); submitCreateKanbanTaskForm();" class="auth-form" style="gap: 20px;">
+        <div class="form-group">
+          <label for="kanban-title-input">Título de la Actividad</label>
+          <input type="text" id="kanban-title-input" required placeholder="Ej: Repasar para examen de Cálculo">
+        </div>
+        <div class="form-group">
+          <label for="kanban-desc-input">Detalles o Descripción corta</label>
+          <textarea id="kanban-desc-input" required placeholder="Ej: Repasar capítulos 3 y 4 del libro guía." style="min-height: 80px; padding: 12px; border-radius: var(--radius-sm); border: 1px solid rgba(120,53,4,0.25); outline: none; font-size:14px; resize: none;"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="kanban-subject-input">Materia Asociada</label>
+          <input type="text" id="kanban-subject-input" required placeholder="Ej: Cálculo II" value="General">
+        </div>
+        <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 10px;">Registrar Actividad</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Crear Subtask (Asignar Tarea del Nido) -->
+  <div class="content-modal" id="modal-create-subtask">
+    <div class="modal-sheet" style="max-width: 500px;">
+      <button class="modal-close" onclick="closeModalForm('create-subtask')">✕</button>
+      <div class="modal-title-header">
+        <h2 style="font-size: 24px; color: var(--color-emerald); display: flex; align-items: center; gap: 10px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Asignar Subtarea Grupal
+        </h2>
+        <p>Desglosa los entregables del Nido y delega responsabilidades claras.</p>
+      </div>
+      
+      <form id="form-create-subtask" onsubmit="event.preventDefault(); submitCreateSubtaskForm();" class="auth-form" style="gap: 20px;">
+        <div class="form-group">
+          <label for="subtask-title-input">Título de la Subtarea</label>
+          <input type="text" id="subtask-title-input" required placeholder="Ej: Marco Teórico & Ecuaciones">
+        </div>
+        <div class="form-group">
+          <label for="subtask-assignee-select">Responsable del Entregable</label>
+          <select id="subtask-assignee-select" required style="padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid rgba(120,53,4,0.25); outline: none; background-color: #fff; font-size:14px;">
+            <!-- Opciones cargadas dinámicamente -->
+          </select>
+        </div>
+        <button class="btn btn-primary" type="submit" style="width: 100%; margin-top: 10px;">Asignar Subtarea</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Subir Archivos (PDF, Word, Imágenes) -->
+  <div class="content-modal" id="modal-upload-file">
+    <div class="modal-sheet" style="max-width: 500px;">
+      <button class="modal-close" onclick="closeModalForm('upload-file')">✕</button>
+      <div class="modal-title-header">
+        <h2 style="font-size: 24px; color: var(--color-emerald); display: flex; align-items: center; gap: 10px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Subir Entregable Académico
+        </h2>
+        <p>Carga tu borrador o documento final para marcar la subtarea como completada.</p>
+      </div>
+      
+      <div class="upload-dropzone" id="upload-file-dropzone" onclick="document.getElementById('modal-file-input').click()">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted); margin-bottom: 12px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <p style="font-weight: 600; font-size: 14px;">Arrastra tu documento aquí o haz clic para buscar</p>
+        <span style="font-size: 12px; color: var(--color-text-muted); margin-top: 4px;">Soporta PDF, Word (.docx) o Imágenes (Máx. 1.5MB)</span>
+        <input type="file" id="modal-file-input" style="display: none;" onchange="handleModalFileSelect(this)">
+      </div>
+      
+      <div class="upload-file-preview" id="modal-file-preview" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 24px;">📄</span>
+          <div>
+            <strong id="modal-file-name" style="font-size: 13px; display: block; word-break: break-all;">archivo.pdf</strong>
+            <span id="modal-file-size" style="font-size: 11px; color: var(--color-text-muted);">0 KB</span>
+          </div>
+        </div>
+        <button class="chat-file-remove" onclick="clearModalFile()" style="position: static; font-size: 16px;">✕</button>
+      </div>
+      
+      <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button class="btn btn-secondary" onclick="closeModalForm('upload-file')" style="flex: 1; padding: 10px;">Cancelar</button>
+        <button class="btn btn-primary" id="btn-submit-upload-file" onclick="submitModalUploadFile()" style="flex: 1; padding: 10px;" disabled>Subir y Completar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SDKs de Firebase (Versiones Compatibles para integración limpia) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  
+  <!-- Configuración de Firebase & Simulador -->
+  <script src="js/firebase-config.js"></script>
+  
+  <!-- Lógica Principal de la App -->
+  <script src="js/app.js"></script>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav">
+    <div class="mobile-nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+      <span>Inicio</span>
+    </div>
+    <div class="mobile-nav-item" data-tab="productivity" onclick="switchTab('productivity')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Enfoque</span>
+    </div>
+    <div class="mobile-nav-item" data-tab="nidos" onclick="switchTab('nidos')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Nidos</span>
+    </div>
+    <div class="mobile-nav-item" data-tab="alerts" onclick="switchTab('alerts'); markAllNotificationsAsRead();">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span style="position: relative;">
+        Alertas
+        <div class="notif-badge" id="mobile-unread-notif-badge" style="display:none; top: -8px; right: -12px; font-size: 8px; width: 12px; height: 12px;">0</div>
+      </span>
+    </div>
+  </nav>
+</body>
+</html>
