@@ -1871,4 +1871,31 @@ button, input, textarea, select {
   }
 }
 
+/* Estilos de Botón de Cerrar Sesión en Header (Móviles) */
+.header-logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-bg-base);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  transition: var(--transition-fast);
+  cursor: pointer;
+  outline: none;
+}
+.header-logout-btn:hover {
+  background-color: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.25);
+  color: #dc2626;
+}
+
+@media (min-width: 769px) {
+  .header-logout-btn {
+    display: none !important; /* Ocultar en PC ya que está en la barra lateral */
+  }
+}
+
 
