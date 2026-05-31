@@ -1070,6 +1070,41 @@
     </div>
   </div>
 
+  <!-- Modal: Advertencia de Reglas de Firebase Desconfiguradas -->
+  <div class="content-modal" id="modal-firebase-rules-error">
+    <div class="modal-sheet" style="max-width: 480px; text-align: center;">
+      <button class="modal-close" onclick="closeModalForm('firebase-rules-error')">✕</button>
+      <div class="modal-title-header">
+        <h2 style="font-size: 24px; color: #dc2626; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800;">
+          ⚠️ ¡Reglas de Firebase Bloqueadas!
+        </h2>
+        <p style="margin-top: 8px;">Tu base de datos está rechazando los cambios porque tus <strong>Reglas de Seguridad</strong> en la consola de Firebase han expirado o están bloqueando escrituras.</p>
+      </div>
+      
+      <div style="text-align: left; background: rgba(0, 0, 0, 0.04); padding: 18px; border-radius: 8px; font-size: 13px; margin: 20px 0; border: 1px dashed rgba(220, 38, 38, 0.25);">
+        <strong style="color: var(--color-text-primary); font-size: 14px;">Para solucionarlo y activar el guardado real ahora mismo:</strong>
+        <ol style="margin-top: 8px; padding-left: 20px; color: var(--color-text-secondary); display: flex; flex-direction: column; gap: 6px;">
+          <li>Entra a tu <a href="https://console.firebase.google.com/" target="_blank" style="color: var(--color-turquoise); font-weight: 700; text-decoration: underline;">Consola de Firebase</a>.</li>
+          <li>Abre tu proyecto <strong>studynest-ad41f</strong>.</li>
+          <li>En el menú izquierdo ve a <strong>Firestore Database</strong> ➔ pestaña <strong>Reglas (Rules)</strong>.</li>
+          <li>Reemplaza las reglas por estas (permiten acceso real a usuarios logueados):
+            <pre style="background: #0f172a; color: #f8fafc; padding: 10px; border-radius: 6px; font-size: 11px; margin-top: 8px; font-family: monospace; overflow-x: auto; user-select: all; border: 1px solid rgba(255,255,255,0.1);">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}</pre>
+          </li>
+          <li>Haz clic en el botón azul <strong>Publicar (Publish)</strong>.</li>
+        </ol>
+      </div>
+      
+      <button class="btn btn-primary" onclick="closeModalForm('firebase-rules-error')" style="width: 100%; padding: 12px;">Entendido, lo corregiré ahora</button>
+    </div>
+  </div>
+
   <!-- SDKs de Firebase (Versiones Compatibles para integración limpia) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>

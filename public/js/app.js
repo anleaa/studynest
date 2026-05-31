@@ -420,6 +420,7 @@ async function createNido(name, subject, tentativeDeadline, finalDeadline, invit
       showToast('⚠️ Falló Firebase', 'Error de conexión o reglas vencidas. Guardando localmente...', 'danger');
       state.offlineMode = true;
       toggleSimulatorWidgetVisibility();
+      openModalForm('firebase-rules-error');
     }
   }
 
@@ -477,6 +478,7 @@ async function addSubtask(nidoId, title, assignedTo) {
       showToast('⚠️ Falló Firebase', 'Error de conexión o reglas vencidas. Guardando localmente...', 'danger');
       state.offlineMode = true;
       toggleSimulatorWidgetVisibility();
+      openModalForm('firebase-rules-error');
     }
   }
 
@@ -547,6 +549,7 @@ async function toggleSubtask(nidoId, subtaskId, completed, fileData = null) {
       showToast('⚠️ Falló Firebase', 'Error de conexión o reglas vencidas. Guardando localmente...', 'danger');
       state.offlineMode = true;
       toggleSimulatorWidgetVisibility();
+      openModalForm('firebase-rules-error');
     }
   }
 
@@ -634,6 +637,7 @@ async function sendChatMessage(nidoId, messageText, fileData = null) {
       showToast('⚠️ Falló Firebase', 'Error de conexión o reglas vencidas. Guardando localmente...', 'danger');
       state.offlineMode = true;
       toggleSimulatorWidgetVisibility();
+      openModalForm('firebase-rules-error');
     }
   }
 
@@ -1844,6 +1848,7 @@ async function joinNidoByCode(code) {
       showToast('⚠️ Falló Firebase', 'Error de conexión o reglas vencidas. Uniéndose localmente...', 'danger');
       state.offlineMode = true;
       toggleSimulatorWidgetVisibility();
+      openModalForm('firebase-rules-error');
     }
   }
   
