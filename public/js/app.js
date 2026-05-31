@@ -386,6 +386,11 @@ async function createNido(name, subject, tentativeDeadline, finalDeadline, invit
   const code = generateShortCode();
   lastCreatedNidoCode = code;
 
+  if (!state.currentUser) {
+    showToast('⚠️ Inicia Sesión', 'Debes iniciar sesión para crear un Nido.', 'danger');
+    return;
+  }
+
   if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized && !state.offlineMode) {
     try {
       const emailsList = [state.currentUser.email, ...invitedEmails];
