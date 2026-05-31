@@ -1292,17 +1292,17 @@ function renderNidoDetailView() {
       const isCompleted = s.completed;
       subtasksRowsHtml += `
         <tr>
-          <td><strong>${s.title}</strong></td>
-          <td>
+          <td data-label="Subtarea"><strong>${s.title}</strong></td>
+          <td data-label="Asignado a">
             <div class="member-badge">
               <span style="font-size:13px; font-weight:500;">${s.assignedTo}</span>
             </div>
           </td>
-          <td>
+          <td data-label="Estado">
             <span class="status-badge ${isCompleted ? 'completed' : 'pending'}">${isCompleted ? 'Completado' : 'Pendiente'}</span>
             ${s.fileUrl ? `<br><a href="${s.fileUrl}" target="_blank" download="${s.fileName}" style="font-size:11px; color:var(--color-turquoise); font-weight:600; text-decoration:none; margin-top:2px; display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Descargar: ${s.fileName}</a>` : ''}
           </td>
-          <td>
+          <td data-label="Mi Acción">
             ${isSelfAssigned ? `
               <label class="custom-check-wrapper">
                 <input type="checkbox" class="custom-check-input" ${isCompleted ? 'checked' : ''} onchange="handleSubtaskToggleClick('${nido.id}', '${s.id}', this.checked)">

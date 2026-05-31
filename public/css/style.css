@@ -1738,6 +1738,137 @@ button, input, textarea, select {
   .app-content {
     padding: 16px;
   }
+
+  /* Kanban apilado verticalmente en móviles */
+  .kanban-board {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+  .kanban-col {
+    min-height: auto !important;
+    padding: 14px;
+  }
+
+  /* Optimización sección Hero y laptop 3D */
+  .hero {
+    padding-top: 110px;
+    padding-bottom: 70px;
+  }
+  .hero-left h1 {
+    font-size: 28px !important;
+    letter-spacing: -0.03em;
+  }
+  .hero-left .subtext {
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+  .hero-right {
+    padding: 10px;
+  }
+  .svg-illustration {
+    max-width: 290px !important;
+  }
+}
+
+/* Escalado para celulares muy pequeños */
+@media (max-width: 480px) {
+  .logo {
+    font-size: 20px !important;
+    gap: 8px !important;
+  }
+  .logo svg {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  #btn-navbar-register {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+  }
+  .hero-left .btn-group {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+  }
+  .hero-left .btn-group .btn {
+    width: 100%;
+    text-align: center;
+  }
+  .chat-bubble {
+    max-width: 88% !important;
+  }
+  .chat-input-field {
+    font-size: 13px;
+  }
+  .glass-panel {
+    padding: 16px !important;
+  }
+  
+  /* Ajuste de botones en la cabecera del panel */
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .panel-header div {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+  }
+  .panel-header .btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    font-size: 11px !important;
+  }
+}
+
+/* Transformación de tabla horizontal a tarjetas responsivas en móvil */
+@media (max-width: 600px) {
+  .nido-tasks-table, 
+  .nido-tasks-table tbody, 
+  .nido-tasks-table tr, 
+  .nido-tasks-table td {
+    display: block !important;
+    width: 100%;
+  }
+  
+  .nido-tasks-table thead {
+    display: none !important; /* Ocultar cabeceras de tabla */
+  }
+  
+  .nido-tasks-table tr {
+    margin-bottom: 16px;
+    background: rgba(255, 255, 255, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.01) !important;
+  }
+  
+  .nido-tasks-table td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    text-align: right;
+  }
+  
+  .nido-tasks-table td:last-child {
+    border-bottom: none !important;
+  }
+  
+  /* Genera etiquetas responsivas usando el atributo data-label */
+  .nido-tasks-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    font-size: 11px;
+    text-align: left;
+    margin-right: 12px;
+  }
 }
 
 
