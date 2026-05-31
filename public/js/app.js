@@ -69,6 +69,7 @@ async function checkServerConnection() {
     initFirebaseListeners();
     loadLocalState(); 
     toggleSimulatorWidgetVisibility();
+    updateConnectionStatusBadge();
     return;
   }
 
@@ -93,6 +94,7 @@ async function checkServerConnection() {
   }
   
   toggleSimulatorWidgetVisibility();
+  updateConnectionStatusBadge();
 }
 
 function toggleSimulatorWidgetVisibility() {
@@ -103,6 +105,28 @@ function toggleSimulatorWidgetVisibility() {
     } else {
       widget.style.display = 'none'; // Ocultar widget de simulación si se conecta a Firebase real
     }
+  }
+}
+
+function updateConnectionStatusBadge() {
+  const badge = document.getElementById('connection-status-badge');
+  const dot = document.getElementById('connection-status-dot');
+  const text = document.getElementById('connection-status-text');
+  
+  if (!badge || !dot || !text) return;
+  
+  if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized && !state.offlineMode) {
+    badge.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+    badge.style.color = '#10b981';
+    badge.style.borderColor = 'rgba(16, 185, 129, 0.15)';
+    dot.style.backgroundColor = '#10b981';
+    text.innerText = 'Nube Real (Firebase)';
+  } else {
+    badge.style.backgroundColor = 'rgba(245, 158, 11, 0.1)';
+    badge.style.color = '#d97706';
+    badge.style.borderColor = 'rgba(245, 158, 11, 0.15)';
+    dot.style.backgroundColor = '#d97706';
+    text.innerText = 'Modo Local (Simulado)';
   }
 }
 
@@ -425,6 +449,7 @@ async function createNido(name, subject, tentativeDeadline, finalDeadline, invit
       showToast('⚠️ Falló Firebase', 'Error de conexión o reglas vencidas. Guardando localmente...', 'danger');
       state.offlineMode = true;
       toggleSimulatorWidgetVisibility();
+      updateConnectionStatusBadge();
       openModalForm('firebase-rules-error');
     }
   }
