@@ -1898,4 +1898,71 @@ button, input, textarea, select {
   }
 }
 
+/* ==========================================================================
+   NUEVAS OPTIMIZACIONES DE ADAPTABILIDAD MÓVIL
+   ========================================================================== */
+
+/* Grilla de nidos responsiva */
+.nidos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* Panel de chat con altura fija y scroll interno */
+.nido-chat-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 520px !important;
+}
+.nido-chat-panel .chat-messages {
+  flex-grow: 1 !important;
+  overflow-y: auto !important;
+}
+
+/* Media Query para pantallas medianas / Tablets y móviles (< 768px) */
+@media (max-width: 768px) {
+  .nidos-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .nido-chat-panel {
+    height: 450px !important;
+  }
+
+  /* Evitar solapamiento con la barra de navegación inferior */
+  .simulator-widget {
+    bottom: 86px !important;
+    right: 16px !important;
+  }
+}
+
+/* Media Query para pantallas compactas (< 480px) */
+@media (max-width: 480px) {
+  /* Compactar el badge de conexión en cabecera */
+  #connection-status-text {
+    display: none !important;
+  }
+  #connection-status-badge {
+    padding: 8px !important;
+    width: 24px;
+    height: 24px;
+    border-radius: 50% !important;
+    justify-content: center;
+    min-width: auto;
+  }
+  
+  /* Ajuste de relleno de modales en pantallas chicas */
+  .modal-sheet, .auth-card {
+    padding: 24px 16px !important;
+    max-height: 90vh !important;
+  }
+  .modal-close, .auth-close {
+    top: 16px !important;
+    right: 16px !important;
+    font-size: 20px !important;
+  }
+}
+
 

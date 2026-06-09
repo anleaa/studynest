@@ -1095,6 +1095,20 @@ function switchTab(tabId) {
   const targetPanel = document.getElementById(`panel-${tabId}`);
   if (targetPanel) targetPanel.style.display = 'block';
 
+  // Actualizar dinámicamente el título del encabezado
+  const titleEl = document.getElementById('current-tab-title');
+  if (titleEl) {
+    if (tabId === 'dashboard') {
+      titleEl.innerText = 'Tablero de Inicio';
+    } else if (tabId === 'productivity') {
+      titleEl.innerText = 'Enfoque & Actividades';
+    } else if (tabId === 'nidos') {
+      titleEl.innerText = state.activeNido ? `Nido: ${state.activeNido.name}` : 'Nidos de Estudio';
+    } else if (tabId === 'alerts') {
+      titleEl.innerText = 'Alertas & Notificaciones';
+    }
+  }
+
   if (tabId === 'dashboard') {
     renderDashboardOverview();
     const gcPlaceholder = document.getElementById('global-chat-placeholder');
@@ -1242,7 +1256,7 @@ function renderNidosTab() {
           <button class="btn btn-primary" onclick="openCreateNidoModal()" style="display:inline-flex; align-items:center; gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Crear Nido</button>
         </div>
       </div>
-      <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:20px;">
+      <div class="nidos-grid">
     `;
 
     if (state.nidos.length === 0) {
@@ -1288,6 +1302,13 @@ function exitNidoView() {
     activeNidoChatUnsubscribe();
     activeNidoChatUnsubscribe = null;
   }
+  
+  // Restablecer título del encabezado dinámicamente
+  const titleEl = document.getElementById('current-tab-title');
+  if (titleEl) {
+    titleEl.innerText = 'Nidos de Estudio';
+  }
+  
   renderNidosTab();
 }
 
@@ -1379,6 +1400,12 @@ function renderNidoDetailView() {
     }
   });
 
+  // Actualizar título del encabezado dinámicamente al entrar a un Nido
+  const titleEl = document.getElementById('current-tab-title');
+  if (titleEl) {
+    titleEl.innerText = `Nido: ${nido.name}`;
+  }
+
   panel.innerHTML = `
     <button class="btn btn-secondary" onclick="exitNidoView()" style="margin-bottom:20px; padding:8px 16px; font-size:13px;">⬅ Volver a Nidos</button>
     
@@ -1433,7 +1460,7 @@ function renderNidoDetailView() {
       </div>
 
       <div>
-        <div class="glass-panel" style="padding:0; overflow:hidden;">
+        <div class="glass-panel nido-chat-panel" style="padding:0; overflow:hidden;">
           <div class="chat-header">
             <div class="avatar-circle" style="background-color:var(--color-emerald-light); color:var(--color-emerald); display:flex; align-items:center; justify-content:center;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
