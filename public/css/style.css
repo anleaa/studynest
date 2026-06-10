@@ -1965,4 +1965,21 @@ button, input, textarea, select {
   }
 }
 
+/* Botón glassmorphic de peligro / eliminación */
+.btn-danger {
+  background: rgba(220, 38, 38, 0.08) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #dc2626 !important;
+  border: 1.5px solid rgba(220, 38, 38, 0.25) !important;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.02) !important;
+}
+.btn-danger:hover {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.2) !important;
+}
+
 

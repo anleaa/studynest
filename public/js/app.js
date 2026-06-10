@@ -1312,6 +1312,69 @@ function exitNidoView() {
   renderNidosTab();
 }
 
+async function confirmDeleteNido(nidoId) {
+  const confirmAction = confirm("⚠️ ¿Estás totalmente seguro de que deseas ELIMINAR este Nido de Estudio?\n\nEsta acción es irreversible y se borrarán de forma permanente todos los entregables, subtareas y el chat grupal para todos los integrantes.");
+  if (!confirmAction) return;
+
+  try {
+    if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized && !state.offlineMode) {
+      // Borrar de Firebase
+      await dbFirestore.collection('nidos').doc(nidoId).delete();
+    } else {
+      // Borrar local
+      state.nidos = state.nidos.filter(n => n.id !== nidoId);
+      saveLocalState();
+    }
+
+    showToast('Nido Eliminado', 'El nido de estudio ha sido eliminado permanentemente.', 'success');
+    exitNidoView();
+  } catch (error) {
+    console.error("Error al eliminar el nido:", error);
+    showToast('Error', 'No se pudo eliminar el nido. Revisa tu conexión.', 'error');
+  }
+}
+
+async function confirmLeaveNido(nidoId) {
+  const confirmAction = confirm("🚪 ¿Estás seguro de que deseas SALIR de este Nido de Estudio?\n\nYa no podrás ver sus entregables, participar en el chat grupal ni recibir las alertas del equipo.");
+  if (!confirmAction) return;
+
+  try {
+    if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized && !state.offlineMode) {
+      const nido = state.nidos.find(n => n.id === nidoId);
+      if (nido) {
+        // Remover de la lista de correos y miembros
+        const updatedMembersEmails = (nido.membersEmails || []).filter(email => email !== state.currentUser.email);
+        const updatedMembers = (nido.members || []).filter(m => m.email !== state.currentUser.email);
+        
+        await dbFirestore.collection('nidos').doc(nidoId).update({
+          membersEmails: updatedMembersEmails,
+          members: updatedMembers
+        });
+
+        // Enviar un mensaje de alerta automático al chat
+        await dbFirestore.collection('chats').add({
+          nidoId: nidoId,
+          senderName: 'StudyNest Bot 🦉',
+          senderEmail: 'bot@studynest.edu',
+          message: `🚪 ${state.currentUser.name} ha salido del Nido de estudio.`,
+          type: 'alert',
+          timestamp: new Date().toISOString()
+        });
+      }
+    } else {
+      // Borrar local
+      state.nidos = state.nidos.filter(n => n.id !== nidoId);
+      saveLocalState();
+    }
+
+    showToast('Has salido del Nido', 'Ya no perteneces a este grupo de estudio.', 'info');
+    exitNidoView();
+  } catch (error) {
+    console.error("Error al salir del nido:", error);
+    showToast('Error', 'No se pudo salir del nido. Revisa tu conexión.', 'error');
+  }
+}
+
 function renderNidoDetailView() {
   const panel = document.getElementById('panel-nidos');
   if (!panel || !state.activeNido) return;
@@ -1407,7 +1470,14 @@ function renderNidoDetailView() {
   }
 
   panel.innerHTML = `
-    <button class="btn btn-secondary" onclick="exitNidoView()" style="margin-bottom:20px; padding:8px 16px; font-size:13px;">⬅ Volver a Nidos</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px; width:100%;">
+      <button class="btn btn-secondary" onclick="exitNidoView()" style="padding:8px 16px; font-size:13px;">⬅ Volver a Nidos</button>
+      ${nido.adminId === state.currentUser.id ? `
+        <button class="btn btn-danger" onclick="confirmDeleteNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">🗑️ Eliminar Nido</button>
+      ` : `
+        <button class="btn btn-danger" onclick="confirmLeaveNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">🚪 Salir del Nido</button>
+      `}
+    </div>
     
     <div class="nido-view-layout">
       <div>
