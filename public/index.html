@@ -520,6 +520,12 @@
             Mis Nidos (Grupos)
           </a>
         </li>
+        <li class="sidebar-menu-item" data-tab="history" onclick="switchTab('history')">
+          <a href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"></path><path d="M1 3h22v5H1z"></path><path d="M10 12h4"></path></svg>
+            Historial
+          </a>
+        </li>
         <li class="sidebar-menu-item" data-tab="alerts" onclick="switchTab('alerts'); markAllNotificationsAsRead();">
           <a href="#">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -595,7 +601,8 @@
                 </div>
               </div>
             </div>
-
+            <!-- Columna Derecha: Controles Próximos -->
+            <div>
               <!-- Controles Próximos -->
               <div class="glass-panel">
                 <h3>Controles Próximos</h3>
@@ -688,6 +695,13 @@
              TAB 3: GROUP WORKSPACES ("NIDOS")
              ========================================== -->
         <div class="glass-panel-content" id="panel-nidos" style="display:none;">
+          <!-- Cargado dinámicamente -->
+        </div>
+
+        <!-- ==========================================
+             TAB 5: COMPLETED WORKSPACES HISTORY ("HISTORIAL")
+             ========================================== -->
+        <div class="glass-panel-content" id="panel-history" style="display:none;">
           <!-- Cargado dinámicamente -->
         </div>
 
@@ -1166,6 +1180,10 @@ service cloud.firestore {
     <div class="mobile-nav-item" data-tab="nidos" onclick="switchTab('nidos')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span>Nidos</span>
+    </div>
+    <div class="mobile-nav-item" data-tab="history" onclick="switchTab('history')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"></path><path d="M1 3h22v5H1z"></path><path d="M10 12h4"></path></svg>
+      <span>Historial</span>
     </div>
     <div class="mobile-nav-item" data-tab="alerts" onclick="switchTab('alerts'); markAllNotificationsAsRead();">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>

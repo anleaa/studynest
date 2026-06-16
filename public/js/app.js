@@ -8,6 +8,7 @@
 let state = {
   currentUser: null,
   activeTab: 'dashboard', 
+  previousTab: null,
   personalTasks: [],      
   nidos: [],              
   activeNido: null,       
@@ -1227,6 +1228,8 @@ function switchTab(tabId) {
       titleEl.innerText = 'Enfoque & Actividades';
     } else if (tabId === 'nidos') {
       titleEl.innerText = state.activeNido ? `Nido: ${state.activeNido.name}` : 'Nidos de Estudio';
+    } else if (tabId === 'history') {
+      titleEl.innerText = 'Historial de Nidos';
     } else if (tabId === 'alerts') {
       titleEl.innerText = 'Alertas & Notificaciones';
     }
@@ -1262,6 +1265,8 @@ function switchTab(tabId) {
     renderProductivityCompletedNidos();
   } else if (tabId === 'nidos') {
     renderNidosTab();
+  } else if (tabId === 'history') {
+    renderHistoryTab();
   } else if (tabId === 'alerts') {
     renderAlertsTab();
     renderEmailLogs();
@@ -1474,7 +1479,6 @@ function renderNidosTab() {
 
   if (!state.activeNido) {
     const activeNidos = state.nidos.filter(n => !n.archived);
-    const archivedNidos = state.nidos.filter(n => n.archived);
 
     let html = `
       <div class="panel-header">
@@ -1511,43 +1515,60 @@ function renderNidosTab() {
     }
 
     html += `</div>`;
-
-    // Sección de Nidos Archivados / Completados
-    html += `
-      <div class="panel-header" style="margin-top: 40px; border-top: 1.5px dashed var(--color-border); padding-top: 30px;">
-        <h3>Nidos Completados e Historial (Archivados)</h3>
-      </div>
-      <div class="nidos-grid">
-    `;
-
-    if (archivedNidos.length === 0) {
-      html += `<p style="grid-column: span 2; color:var(--color-text-secondary); text-align:center; padding:30px; font-size: 13px;">No hay nidos archivados o completados en tu registro.</p>`;
-    } else {
-      archivedNidos.forEach(n => {
-        const comp = n.subtasks ? n.subtasks.filter(s => s.completed).length : 0;
-        const total = n.subtasks ? n.subtasks.length : 0;
-        const pct = total > 0 ? Math.round((comp / total) * 100) : 0;
-        html += `
-          <div class="glass-panel" style="cursor:pointer; opacity: 0.85; border-color: rgba(15, 76, 129, 0.25) !important;" onclick="selectNido('${n.id}')">
-            <h4 style="font-size:18px; color:var(--color-text-muted); font-weight:700; display:flex; align-items:center; gap:8px;">📦 ${n.name} <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; background-color: var(--color-emerald-light); color: var(--color-emerald);">Archivado</span></h4>
-            <p style="font-size:13px; color:var(--color-text-muted); margin-bottom:12px;">Materia: ${n.subject}</p>
-            <div class="collective-progress-container">
-              <div class="collective-progress-bar" style="width:${pct}%; background: var(--color-text-muted);"></div>
-            </div>
-            <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; font-weight:600; color:var(--color-text-muted);">
-              <span>${n.members ? n.members.length : 1} Alumnos</span>
-              <span>100% de Logro 🏆</span>
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    html += `</div>`;
     panel.innerHTML = html;
   } else {
     renderNidoDetailView();
   }
+}
+
+function renderHistoryTab() {
+  const panel = document.getElementById('panel-history');
+  if (!panel) return;
+
+  const archivedNidos = state.nidos.filter(n => n.archived);
+
+  let html = `
+    <div class="panel-header">
+      <h3>Historial de Nidos Completados</h3>
+      <p style="font-size:13px; color:var(--color-text-secondary); margin:0;">Registro de tus grupos de estudio terminados y archivados.</p>
+    </div>
+    <div class="nidos-grid" id="history-nidos-grid">
+  `;
+
+  if (archivedNidos.length === 0) {
+    html += `<p style="grid-column: span 2; color:var(--color-text-secondary); text-align:center; padding:40px;">No tienes nidos archivados o completados en tu historial aún.</p>`;
+  } else {
+    archivedNidos.forEach(n => {
+      const comp = n.subtasks ? n.subtasks.filter(s => s.completed).length : 0;
+      const total = n.subtasks ? n.subtasks.length : 0;
+      const pct = total > 0 ? Math.round((comp / total) * 100) : 0;
+      html += `
+        <div class="glass-panel" style="cursor:pointer; opacity: 0.85; border-color: rgba(15, 76, 129, 0.25) !important;" onclick="selectNidoFromHistory('${n.id}')">
+          <h4 style="font-size:18px; color:var(--color-text-muted); font-weight:700; display:flex; align-items:center; gap:8px;">📦 ${n.name} <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; background-color: var(--color-emerald-light); color: var(--color-emerald);">Archivado</span></h4>
+          <p style="font-size:13px; color:var(--color-text-muted); margin-bottom:12px;">Materia: ${n.subject}</p>
+          <div class="collective-progress-container">
+            <div class="collective-progress-bar" style="width:${pct}%; background: var(--color-text-muted);"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; font-weight:600; color:var(--color-text-muted);">
+            <span>${n.members ? n.members.length : 1} Alumnos</span>
+            <span>100% de Logro 🏆</span>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  html += `</div>`;
+  panel.innerHTML = html;
+}
+
+function selectNidoFromHistory(nidoId) {
+  state.previousTab = 'history';
+  state.activeNido = state.nidos.find(n => n.id === nidoId);
+  switchTab('nidos');
+  fetchChats(nidoId);
+  subscribeToActiveNidoChats();
+  renderNidoDetailView();
 }
 
 function selectNido(nidoId) {
@@ -1564,13 +1585,17 @@ function exitNidoView() {
     activeNidoChatUnsubscribe = null;
   }
   
-  // Restablecer título del encabezado dinámicamente
-  const titleEl = document.getElementById('current-tab-title');
-  if (titleEl) {
-    titleEl.innerText = 'Nidos de Estudio';
+  if (state.previousTab === 'history') {
+    state.previousTab = null;
+    switchTab('history');
+  } else {
+    // Restablecer título del encabezado dinámicamente
+    const titleEl = document.getElementById('current-tab-title');
+    if (titleEl) {
+      titleEl.innerText = 'Nidos de Estudio';
+    }
+    renderNidosTab();
   }
-  
-  renderNidosTab();
 }
 
 async function confirmDeleteNido(nidoId) {
@@ -1802,8 +1827,9 @@ function renderNidoDetailView() {
     titleEl.innerText = `Nido: ${nido.name}`;
   }
 
+  const backText = state.previousTab === 'history' ? '⬅ Volver a Historial' : '⬅ Volver a Nidos';
   let headerButtonsHtml = `
-    <button class="btn btn-secondary" onclick="exitNidoView()" style="padding:8px 16px; font-size:13px;">⬅ Volver a Nidos</button>
+    <button class="btn btn-secondary" onclick="exitNidoView()" style="padding:8px 16px; font-size:13px;">${backText}</button>
     <div style="display:flex; gap:8px; align-items:center;">
   `;
 
