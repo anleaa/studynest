@@ -1982,4 +1982,93 @@ button, input, textarea, select {
   box-shadow: 0 6px 20px rgba(220, 38, 38, 0.2) !important;
 }
 
+/* ==========================================================================
+   FLOATING ACTION CHAT WIDGET & FLOATING PANEL
+   ========================================================================== */
+
+.floating-chat-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9990;
+}
+
+.floating-chat-toggle-btn {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0d9488 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  width: 56px;
+  height: 56px;
+  border-radius: 50% !important;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.25) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  transition: var(--transition-smooth);
+}
+.floating-chat-toggle-btn:hover {
+  transform: scale(1.08) rotate(-8deg);
+  box-shadow: 0 12px 30px rgba(14, 165, 233, 0.35) !important;
+}
+.floating-chat-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+.floating-chat-panel {
+  position: absolute;
+  bottom: 72px;
+  right: 0;
+  width: 380px;
+  height: 500px;
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(25px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(120%) !important;
+  border-radius: var(--radius-md) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: var(--shadow-lg) !important;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 9991;
+}
+.floating-chat-panel.active {
+  display: flex;
+  animation: slideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Evitar superposición en móviles y tablets (< 768px) */
+@media (max-width: 768px) {
+  .floating-chat-widget {
+    bottom: 86px !important;
+    right: 16px !important;
+  }
+  .floating-chat-panel {
+    width: calc(100vw - 32px) !important;
+    max-width: 350px !important;
+    height: 420px !important;
+    right: 0 !important;
+    bottom: 70px !important;
+  }
+  
+  /* Desplazar el simulador de compañeros para que no colisione */
+  .simulator-widget {
+    bottom: 148px !important;
+    right: 16px !important;
+  }
+}
+
+/* Animación de apertura para panel flotante */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 

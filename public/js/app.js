@@ -151,6 +151,9 @@ function initFirebaseListeners() {
       document.getElementById('app-view').style.display = 'grid';
       document.getElementById('profile-user-name').innerText = state.currentUser.name;
       document.getElementById('profile-user-email').innerText = state.currentUser.email;
+      
+      const chatWidget = document.getElementById('uni-chat-widget');
+      if (chatWidget) chatWidget.style.display = 'block';
 
       // Subscribe to Nidos in real-time
       dbFirestore.collection('nidos')
@@ -189,6 +192,12 @@ function initFirebaseListeners() {
       state.globalChatConnected = false;
       document.getElementById('app-view').style.display = 'none';
       document.getElementById('landing-view').style.display = 'block';
+      const chatWidget = document.getElementById('uni-chat-widget');
+      if (chatWidget) {
+        chatWidget.style.display = 'none';
+        const chatPanel = document.getElementById('uni-chat-panel');
+        if (chatPanel) chatPanel.classList.remove('active');
+      }
     }
   });
 }
@@ -357,6 +366,9 @@ function onLoginSuccess(silent = false) {
   document.getElementById('profile-user-name').innerText = state.currentUser.name;
   document.getElementById('profile-user-email').innerText = state.currentUser.email;
   
+  const chatWidget = document.getElementById('uni-chat-widget');
+  if (chatWidget) chatWidget.style.display = 'block';
+
   fetchNidos();
   switchTab('dashboard');
   
@@ -380,6 +392,14 @@ function handleLogout() {
   state.currentUser = null;
   state.globalChatConnected = false; // Reset chat state
   localStorage.removeItem('studynest_current_user'); // Clear saved session
+  
+  const chatWidget = document.getElementById('uni-chat-widget');
+  if (chatWidget) {
+    chatWidget.style.display = 'none';
+    const chatPanel = document.getElementById('uni-chat-panel');
+    if (chatPanel) chatPanel.classList.remove('active');
+  }
+
   document.getElementById('app-view').style.display = 'none';
   document.getElementById('landing-view').style.display = 'block';
   showToast('Sesión cerrada', 'Vuelve pronto para seguir estudiando.');
@@ -556,6 +576,26 @@ async function toggleSubtask(nidoId, subtaskId, completed, fileData = null) {
             milestoneMsg = `🎉 ¡Buen trabajo! El Nido ha alcanzado el 50% de la meta general. ¡Sigan así!`;
           } else if (completed && pct === 100) {
             milestoneMsg = `🏆 ¡Excelente! Se ha completado el 100% de las subtareas en este Nido. ¡Trabajo terminado con éxito!`;
+            
+            // Add notification for all members
+            if (nidoData.members) {
+              nidoData.members.forEach(async (member) => {
+                const notifKey = `completion-${nidoId}-${member.id}`;
+                const newNotif = {
+                  userId: member.id,
+                  title: '🏆 Nido Completado: ¡Felicitaciones!',
+                  message: `El nido "${nidoData.name}" ha completado el 100% de sus subtareas.`,
+                  type: 'milestone',
+                  timestamp: new Date().toISOString(),
+                  read: false
+                };
+                try {
+                  await dbFirestore.collection('notifications').doc(notifKey).set(newNotif);
+                } catch (err) {
+                  console.warn("⚠️ Error saving notification for member:", member.email, err);
+                }
+              });
+            }
           }
 
           if (milestoneMsg) {
@@ -606,6 +646,20 @@ async function toggleSubtask(nidoId, subtaskId, completed, fileData = null) {
           milestoneMsg = `🎉 ¡Buen trabajo! El Nido ha alcanzado el 50% de la meta general. ¡Sigan así!`;
         } else if (completed && pct === 100) {
           milestoneMsg = `🏆 ¡Excelente! Se ha completado el 100% de las subtareas en este Nido. ¡Trabajo terminado con éxito!`;
+          
+          // Local notification
+          const notifKey = `completion-${nidoId}-${state.currentUser.id}-${Date.now()}`;
+          const newNotif = {
+            id: notifKey,
+            userId: state.currentUser.id,
+            title: '🏆 Nido Completado: ¡Felicitaciones!',
+            message: `El nido "${nido.name}" ha completado el 100% de sus subtareas.`,
+            type: 'milestone',
+            timestamp: new Date().toISOString(),
+            read: false
+          };
+          state.notifications.unshift(newNotif);
+          updateUnreadNotificationBadge();
         }
 
         if (milestoneMsg) {
@@ -702,6 +756,7 @@ function runOfflineAlertCheck() {
   if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized) {
     const now = new Date();
     state.nidos.forEach(async (nido) => {
+      if (nido.archived) return; // No generar alertas para nidos archivados
       if (!nido.tentativeDeadline) return;
       const tentativeDate = new Date(nido.tentativeDeadline);
       const diffHours = (tentativeDate - now) / (1000 * 60 * 60);
@@ -710,30 +765,40 @@ function runOfflineAlertCheck() {
         nido.subtasks.forEach(async (subtask) => {
           if (!subtask.completed) {
             const notifKey = `pressure-${nido.id}-${subtask.id}`;
-            const exists = state.notifications.some(n => n.id === notifKey);
-            
-            if (!exists) {
-              const newNotif = {
-                userId: state.currentUser.id,
-                title: '⚠️ Recordatorio Presión: ¡Faltas Tú!',
-                message: `El control en "${nido.name}" vence pronto. Tu tarea "${subtask.title}" está pendiente.`,
-                type: 'pressure',
-                timestamp: new Date().toISOString(),
-                read: false
-              };
-              
-              await dbFirestore.collection('notifications').doc(notifKey).set(newNotif);
-              
-              await dbFirestore.collection('chats').add({
-                nidoId: nido.id,
-                senderName: 'StudyNest Bot 🦉',
-                senderEmail: 'bot@studynest.edu',
-                message: `📢 Alerta de equipo: Quedan menos de 24 horas para el control y la subtarea "${subtask.title}" asignada a ${subtask.assignedTo} sigue pendiente.`,
-                timestamp: new Date().toISOString(),
-                type: 'alert'
-              });
+            try {
+              const notifDoc = await dbFirestore.collection('notifications').doc(notifKey).get();
+              if (!notifDoc.exists) {
+                // Buscar el miembro asignado para asignarle su ID correcto
+                const assigneeMember = nido.members ? nido.members.find(m => m.email === subtask.assignedTo) : null;
+                const assigneeId = assigneeMember ? assigneeMember.id : state.currentUser.id;
 
-              logMockEmail(nido.name, subtask.assignedTo, subtask.assignedTo, `¡Faltas tú por subir tu parte al nido! Tu subtarea "${subtask.title}" está pendiente.`);
+                const newNotif = {
+                  userId: assigneeId,
+                  title: '⚠️ Recordatorio Presión: ¡Faltas Tú!',
+                  message: `El control en "${nido.name}" vence pronto. Tu tarea "${subtask.title}" está pendiente.`,
+                  type: 'pressure',
+                  timestamp: new Date().toISOString(),
+                  read: false
+                };
+                
+                await dbFirestore.collection('notifications').doc(notifKey).set(newNotif);
+                
+                await dbFirestore.collection('chats').add({
+                  nidoId: nido.id,
+                  senderName: 'StudyNest Bot 🦉',
+                  senderEmail: 'bot@studynest.edu',
+                  message: `📢 Alerta de equipo: Quedan menos de 24 horas para el control y la subtarea "${subtask.title}" asignada a ${subtask.assignedTo} sigue pendiente.`,
+                  timestamp: new Date().toISOString(),
+                  type: 'alert'
+                });
+
+                // Enviar correo electrónico real a Gmail
+                const subject = `⚠️ ¡Faltas tú por subir tu parte al nido "${nido.name}"!`;
+                const content = `Hola, el control en tu nido de estudio "${nido.name}" vence en menos de 24 horas. Tu subtarea "${subtask.title}" está pendiente de entrega. Sube tu archivo borrador a la plataforma para completar la meta general de tu grupo.`;
+                await sendEmailToGmail(subtask.assignedTo, subject, content);
+              }
+            } catch (err) {
+              console.error("❌ Error en la verificación de alertas en Firebase:", err);
             }
           }
         });
@@ -747,6 +812,7 @@ function runOfflineAlertCheck() {
   let changed = false;
 
   state.nidos.forEach(nido => {
+    if (nido.archived) return;
     if (!nido.tentativeDeadline) return;
     const tentativeDate = new Date(nido.tentativeDeadline);
     const diffHours = (tentativeDate - now) / (1000 * 60 * 60);
@@ -758,18 +824,28 @@ function runOfflineAlertCheck() {
           const exists = state.notifications.some(n => n.id === notifKey);
           
           if (!exists) {
-            const newNotif = {
-              id: notifKey,
-              title: '⚠️ Recordatorio Presión: ¡Faltas Tú!',
-              message: `El control en "${nido.name}" vence pronto. Tu tarea "${subtask.title}" está pendiente.`,
-              type: 'pressure',
-              timestamp: new Date().toISOString(),
-              read: false
-            };
-            state.notifications.unshift(newNotif);
-            changed = true;
+            // Buscar el miembro asignado
+            const assigneeMember = nido.members ? nido.members.find(m => m.email === subtask.assignedTo) : null;
+            const assigneeId = assigneeMember ? assigneeMember.id : state.currentUser.id;
 
-            logMockEmail(nido.name, subtask.assignedTo, subtask.assignedTo, `¡Faltas tú por subir tu parte al nido! Tu subtarea "${subtask.title}" está pendiente.`);
+            // Solo agregar notificación local al usuario activo si es de él
+            if (assigneeId === state.currentUser.id) {
+              const newNotif = {
+                id: notifKey,
+                title: '⚠️ Recordatorio Presión: ¡Faltas Tú!',
+                message: `El control en "${nido.name}" vence pronto. Tu tarea "${subtask.title}" está pendiente.`,
+                type: 'pressure',
+                timestamp: new Date().toISOString(),
+                read: false
+              };
+              state.notifications.unshift(newNotif);
+              changed = true;
+            }
+
+            // Enviar correo (logueado en el panel local de Alertas e intentando EmailJS)
+            const subject = `⚠️ ¡Faltas tú por subir tu parte al nido "${nido.name}"!`;
+            const content = `Hola, el control en tu nido de estudio "${nido.name}" vence en menos de 24 horas. Tu subtarea "${subtask.title}" está pendiente de entrega. Sube tu archivo borrador a la plataforma para completar la meta general de tu grupo.`;
+            sendEmailToGmail(subtask.assignedTo, subject, content);
 
             state.chats.nido[nido.id] = state.chats.nido[nido.id] || [];
             state.chats.nido[nido.id].push({
@@ -782,6 +858,7 @@ function runOfflineAlertCheck() {
               type: 'alert'
             });
 
+            changed = true;
             showToast('⚠️ Presión de Control', `Alerta de control enviada al chat del Nido y correo de ${subtask.assignedTo}.`, 'warning');
           }
         }
@@ -813,6 +890,52 @@ function logMockEmail(nidoName, recipientName, recipientEmail, content) {
 function renderEmailLogs() {
   // Las alertas de correo se imprimen en la consola del navegador como logs internos
   console.log("📬 Historial de correos enviado (interno):", state.emailLogs);
+}
+
+// Envía correos reales a Gmail a través de la API de EmailJS si está configurada
+async function sendEmailToGmail(recipientEmail, subject, content) {
+  // Registrar log interno
+  logMockEmail("Gmail Real", recipientEmail, recipientEmail, content);
+
+  if (typeof EMAILJS_CONFIG !== 'undefined' && EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.publicKey !== "YOUR_PUBLIC_KEY") {
+    if (typeof emailjs !== 'undefined') {
+      try {
+        await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+          to_email: recipientEmail,
+          subject: subject,
+          message: content,
+          app_name: "StudyNest"
+        }, EMAILJS_CONFIG.publicKey);
+        console.log(`✉️ Correo real enviado con éxito a ${recipientEmail} vía EmailJS.`);
+      } catch (error) {
+        console.error("❌ Error enviando correo vía EmailJS:", error);
+      }
+    } else {
+      console.warn("⚠️ SDK de EmailJS no está cargado.");
+    }
+  } else {
+    console.log("📢 EmailJS no está configurado. Configúralo en firebase-config.js para enviar correos reales.");
+  }
+}
+
+// Alternar la visibilidad de la ventana de chat flotante general
+function toggleFloatingChat() {
+  const panel = document.getElementById('uni-chat-panel');
+  if (panel) {
+    const isActive = panel.classList.toggle('active');
+    if (isActive) {
+      if (!state.globalChatConnected) {
+        connectAndEnterGlobalChat();
+      } else {
+        const msgContainer = document.getElementById('global-chat-messages');
+        if (msgContainer) {
+          setTimeout(() => {
+            msgContainer.scrollTop = msgContainer.scrollHeight;
+          }, 100);
+        }
+      }
+    }
+  }
 }
 
 // 7. POMODORO TIMER CORE CONTROLS
@@ -1140,13 +1263,15 @@ function renderDashboardOverview() {
   const activeNidosList = document.getElementById('dashboard-active-nidos');
   if (activeNidosList) activeNidosList.innerHTML = '';
 
-  if (state.nidos.length === 0) {
+  const activeNidos = state.nidos.filter(n => !n.archived);
+
+  if (activeNidos.length === 0) {
     upcomingList.innerHTML = '<p class="text-secondary" style="font-size:13px;">No hay fechas límites próximas.</p>';
-    if (activeNidosList) activeNidosList.innerHTML = '<p class="text-secondary" style="font-size:13px;">Aún no perteneces a ningún Nido de estudio.</p>';
+    if (activeNidosList) activeNidosList.innerHTML = '<p class="text-secondary" style="font-size:13px;">Aún no perteneces a ningún Nido de estudio activo.</p>';
     return;
   }
 
-  state.nidos.forEach(nido => {
+  activeNidos.forEach(nido => {
     const compCount = nido.subtasks ? nido.subtasks.filter(s => s.completed).length : 0;
     const totalCount = nido.subtasks ? nido.subtasks.length : 0;
     const pct = totalCount > 0 ? Math.round((compCount / totalCount) * 100) : 0;
@@ -1230,9 +1355,7 @@ function connectAndEnterGlobalChat() {
         snapshot.forEach(doc => {
           state.chats.global.push({ id: doc.id, ...doc.data() });
         });
-        if (state.activeTab === 'dashboard') {
-          renderGlobalChat();
-        }
+        renderGlobalChat();
       });
   } else {
     fetchChats('global').then(() => {
@@ -1248,21 +1371,24 @@ function renderNidosTab() {
   if (!panel) return;
 
   if (!state.activeNido) {
+    const activeNidos = state.nidos.filter(n => !n.archived);
+    const archivedNidos = state.nidos.filter(n => n.archived);
+
     let html = `
       <div class="panel-header">
         <h3>Nidos de Estudio Activos</h3>
         <div style="display:flex; gap:8px;">
           <button class="btn btn-secondary" onclick="openJoinNidoModal()" style="display:inline-flex; align-items:center; gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></svg> Unirse por Código</button>
-          <button class="btn btn-primary" onclick="openCreateNidoModal()" style="display:inline-flex; align-items:center; gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Crear Nido</button>
+          <button class="btn btn-primary" onclick="openCreateNidoModal()" style="display:inline-flex; align-items:center; gap:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Crear Nido</button>
         </div>
       </div>
       <div class="nidos-grid">
     `;
 
-    if (state.nidos.length === 0) {
-      html += `<p style="grid-column: span 2; color:var(--color-text-secondary); text-align:center; padding:40px;">No estás registrado en ningún nido. Crea un nido e invita a tus compañeros.</p>`;
+    if (activeNidos.length === 0) {
+      html += `<p style="grid-column: span 2; color:var(--color-text-secondary); text-align:center; padding:40px;">No estás registrado en ningún nido activo. Crea un nido o únete usando un código de acceso.</p>`;
     } else {
-      state.nidos.forEach(n => {
+      activeNidos.forEach(n => {
         const comp = n.subtasks ? n.subtasks.filter(s => s.completed).length : 0;
         const total = n.subtasks ? n.subtasks.length : 0;
         const pct = total > 0 ? Math.round((comp / total) * 100) : 0;
@@ -1276,6 +1402,39 @@ function renderNidosTab() {
             <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; font-weight:600; color:var(--color-text-secondary);">
               <span>${n.members ? n.members.length : 1} Alumnos</span>
               <span>${pct}% de Logro</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    html += `</div>`;
+
+    // Sección de Nidos Archivados / Completados
+    html += `
+      <div class="panel-header" style="margin-top: 40px; border-top: 1.5px dashed var(--color-border); padding-top: 30px;">
+        <h3>Nidos Completados e Historial (Archivados)</h3>
+      </div>
+      <div class="nidos-grid">
+    `;
+
+    if (archivedNidos.length === 0) {
+      html += `<p style="grid-column: span 2; color:var(--color-text-secondary); text-align:center; padding:30px; font-size: 13px;">No hay nidos archivados o completados en tu registro.</p>`;
+    } else {
+      archivedNidos.forEach(n => {
+        const comp = n.subtasks ? n.subtasks.filter(s => s.completed).length : 0;
+        const total = n.subtasks ? n.subtasks.length : 0;
+        const pct = total > 0 ? Math.round((comp / total) * 100) : 0;
+        html += `
+          <div class="glass-panel" style="cursor:pointer; opacity: 0.85; border-color: rgba(15, 76, 129, 0.25) !important;" onclick="selectNido('${n.id}')">
+            <h4 style="font-size:18px; color:var(--color-text-muted); font-weight:700; display:flex; align-items:center; gap:8px;">📦 ${n.name} <span style="font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; background-color: var(--color-emerald-light); color: var(--color-emerald);">Archivado</span></h4>
+            <p style="font-size:13px; color:var(--color-text-muted); margin-bottom:12px;">Materia: ${n.subject}</p>
+            <div class="collective-progress-container">
+              <div class="collective-progress-bar" style="width:${pct}%; background: var(--color-text-muted);"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:12px; font-weight:600; color:var(--color-text-muted);">
+              <span>${n.members ? n.members.length : 1} Alumnos</span>
+              <span>100% de Logro 🏆</span>
             </div>
           </div>
         `;
@@ -1375,6 +1534,78 @@ async function confirmLeaveNido(nidoId) {
   }
 }
 
+async function archiveNido(nidoId) {
+  const confirmAction = confirm("📦 ¿Deseas archivar/completar este Nido?\n\nSe moverá a la sección de Completados e Historial en la pestaña de Nidos, liberando tu panel de inicio.");
+  if (!confirmAction) return;
+
+  try {
+    if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized && !state.offlineMode) {
+      await dbFirestore.collection('nidos').doc(nidoId).update({ archived: true });
+      
+      // Post alert in chat
+      await dbFirestore.collection('chats').add({
+        nidoId: nidoId,
+        senderName: 'StudyNest Bot 🦉',
+        senderEmail: 'bot@studynest.edu',
+        message: `📦 Este Nido ha sido archivado y guardado en la sección de Nidos Completados e Historial.`,
+        type: 'alert',
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      const nido = state.nidos.find(n => n.id === nidoId);
+      if (nido) {
+        nido.archived = true;
+        
+        state.chats.nido[nidoId] = state.chats.nido[nidoId] || [];
+        state.chats.nido[nidoId].push({
+          id: 'system-archive-' + Date.now(),
+          nidoId: nidoId,
+          senderName: 'StudyNest Bot 🦉',
+          senderEmail: 'bot@studynest.edu',
+          message: `📦 Este Nido ha sido archivado y guardado en la sección de Nidos Completados e Historial.`,
+          type: 'alert',
+          timestamp: new Date().toISOString()
+        });
+        saveLocalState();
+      }
+    }
+
+    showToast('Nido Archivado', 'Guardado en la sección de Completados.', 'success');
+    exitNidoView();
+  } catch (error) {
+    console.error("Error al archivar el nido:", error);
+    showToast('Error', 'No se pudo archivar el nido.', 'danger');
+  }
+}
+
+async function unarchiveNido(nidoId) {
+  try {
+    if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized && !state.offlineMode) {
+      await dbFirestore.collection('nidos').doc(nidoId).update({ archived: false });
+    } else {
+      const nido = state.nidos.find(n => n.id === nidoId);
+      if (nido) {
+        nido.archived = false;
+        saveLocalState();
+      }
+    }
+
+    showToast('Nido Reactivado', 'El nido ha sido desarchivado.', 'success');
+    
+    // Refresh detail view if it was open
+    const n = state.nidos.find(x => x.id === nidoId);
+    if (n) {
+      state.activeNido = n;
+      renderNidoDetailView();
+    } else {
+      exitNidoView();
+    }
+  } catch (error) {
+    console.error("Error al desarchivar el nido:", error);
+    showToast('Error', 'No se pudo desarchivar.', 'danger');
+  }
+}
+
 function renderNidoDetailView() {
   const panel = document.getElementById('panel-nidos');
   if (!panel || !state.activeNido) return;
@@ -1469,14 +1700,26 @@ function renderNidoDetailView() {
     titleEl.innerText = `Nido: ${nido.name}`;
   }
 
+  let headerButtonsHtml = `
+    <button class="btn btn-secondary" onclick="exitNidoView()" style="padding:8px 16px; font-size:13px;">⬅ Volver a Nidos</button>
+    <div style="display:flex; gap:8px; align-items:center;">
+  `;
+
+  if (nido.adminId === state.currentUser.id) {
+    if (nido.archived) {
+      headerButtonsHtml += `<button class="btn btn-primary" onclick="unarchiveNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px; background: linear-gradient(135deg, #0d9488 0%, #0ea5e9 100%) !important;">📤 Reactivar Nido</button>`;
+    } else if (pct === 100) {
+      headerButtonsHtml += `<button class="btn btn-primary" onclick="archiveNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px; background: linear-gradient(135deg, #0f4c81 0%, #0ea5e9 100%) !important;">📦 Archivar Nido</button>`;
+    }
+    headerButtonsHtml += `<button class="btn btn-danger" onclick="confirmDeleteNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">🗑️ Eliminar Nido</button>`;
+  } else {
+    headerButtonsHtml += `<button class="btn btn-danger" onclick="confirmLeaveNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">🚪 Salir del Nido</button>`;
+  }
+  headerButtonsHtml += `</div>`;
+
   panel.innerHTML = `
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px; width:100%;">
-      <button class="btn btn-secondary" onclick="exitNidoView()" style="padding:8px 16px; font-size:13px;">⬅ Volver a Nidos</button>
-      ${nido.adminId === state.currentUser.id ? `
-        <button class="btn btn-danger" onclick="confirmDeleteNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">🗑️ Eliminar Nido</button>
-      ` : `
-        <button class="btn btn-danger" onclick="confirmLeaveNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">🚪 Salir del Nido</button>
-      `}
+      ${headerButtonsHtml}
     </div>
     
     <div class="nido-view-layout">

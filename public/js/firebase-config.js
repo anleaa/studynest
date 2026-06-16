@@ -19,6 +19,14 @@ const firebaseConfig = {
   databaseURL: "https://studynest-ad41f-default-rtdb.firebaseio.com"
 };
 
+// Configuración de EmailJS para el envío de correos reales a Gmail (gratuito)
+// Regístrate en https://www.emailjs.com/ para obtener tus credenciales
+const EMAILJS_CONFIG = {
+  publicKey: "YOUR_PUBLIC_KEY",     // Clave pública (Account -> API Keys)
+  serviceId: "YOUR_SERVICE_ID",     // ID del servicio de correo (e.g. gmail)
+  templateId: "YOUR_TEMPLATE_ID"    // ID de la plantilla de correo
+};
+
 // ============================================================================
 // 🔌 WRAPPER DE COMPATIBILIDAD FIRESTORE -> REALTIME DATABASE
 // ============================================================================
