@@ -22,6 +22,14 @@ let state = {
   globalChatConnected: false
 };
 
+function isNidoArchivedForUser(nido) {
+  if (!state.currentUser) return false;
+  if (nido.archivedBy && nido.archivedBy.includes(state.currentUser.email)) {
+    return true;
+  }
+  return !!nido.archived && (!nido.archivedBy || nido.archivedBy.length === 0);
+}
+
 // Simulated Virtual Classmates Profiles
 const virtualClassmates = {
   lucia: { name: 'Lucía Fernández', email: 'lucia@student.edu', avatar: 'LF' },
@@ -757,7 +765,7 @@ function runOfflineAlertCheck() {
   if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized) {
     const now = new Date();
     state.nidos.forEach(async (nido) => {
-      if (nido.archived) return; // No generar alertas para nidos archivados
+      if (isNidoArchivedForUser(nido)) return; // No generar alertas para nidos archivados
       if (!nido.tentativeDeadline) return;
       const tentativeDate = new Date(nido.tentativeDeadline);
       const diffHours = (tentativeDate - now) / (1000 * 60 * 60);
@@ -813,7 +821,7 @@ function runOfflineAlertCheck() {
   let changed = false;
 
   state.nidos.forEach(nido => {
-    if (nido.archived) return;
+    if (isNidoArchivedForUser(nido)) return;
     if (!nido.tentativeDeadline) return;
     const tentativeDate = new Date(nido.tentativeDeadline);
     const diffHours = (tentativeDate - now) / (1000 * 60 * 60);
@@ -1284,8 +1292,8 @@ function renderDashboardOverview() {
   const completedNidosList = document.getElementById('dashboard-completed-nidos');
   if (completedNidosList) completedNidosList.innerHTML = '';
 
-  const activeNidos = state.nidos.filter(n => !n.archived);
-  const completedNidos = state.nidos.filter(n => n.archived);
+  const activeNidos = state.nidos.filter(n => !isNidoArchivedForUser(n));
+  const completedNidos = state.nidos.filter(n => isNidoArchivedForUser(n));
 
   // 1. Renderizar controles próximos (sólo para nidos activos)
   let upcomingCount = 0;
@@ -1385,7 +1393,7 @@ function renderProductivityCompletedNidos() {
   if (!container) return;
   container.innerHTML = '';
 
-  const completedNidos = state.nidos.filter(n => n.archived);
+  const completedNidos = state.nidos.filter(n => isNidoArchivedForUser(n));
 
   if (completedNidos.length === 0) {
     container.innerHTML = '<p class="text-secondary" style="font-size:12px; text-align:center; padding:10px;">No tienes nidos completados aún.</p>';
@@ -1667,21 +1675,32 @@ async function archiveNido(nidoId) {
 
   try {
     if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized && !state.offlineMode) {
-      await dbFirestore.collection('nidos').doc(nidoId).update({ archived: true });
+      const nidoDoc = await dbFirestore.collection('nidos').doc(nidoId).get();
+      if (nidoDoc.exists) {
+        const nidoData = nidoDoc.data();
+        let archivedBy = nidoData.archivedBy || [];
+        if (!archivedBy.includes(state.currentUser.email)) {
+          archivedBy.push(state.currentUser.email);
+        }
+        await dbFirestore.collection('nidos').doc(nidoId).update({ archivedBy: archivedBy });
+      }
       
       // Post alert in chat
       await dbFirestore.collection('chats').add({
         nidoId: nidoId,
         senderName: 'StudyNest Bot 🦉',
         senderEmail: 'bot@studynest.edu',
-        message: `📦 Este Nido ha sido archivado y guardado en la sección de Nidos Completados e Historial.`,
+        message: `📦 ${state.currentUser.name} ha archivado este Nido en su historial personal.`,
         type: 'alert',
         timestamp: new Date().toISOString()
       });
     } else {
       const nido = state.nidos.find(n => n.id === nidoId);
       if (nido) {
-        nido.archived = true;
+        nido.archivedBy = nido.archivedBy || [];
+        if (!nido.archivedBy.includes(state.currentUser.email)) {
+          nido.archivedBy.push(state.currentUser.email);
+        }
         
         state.chats.nido[nidoId] = state.chats.nido[nidoId] || [];
         state.chats.nido[nidoId].push({
@@ -1689,7 +1708,7 @@ async function archiveNido(nidoId) {
           nidoId: nidoId,
           senderName: 'StudyNest Bot 🦉',
           senderEmail: 'bot@studynest.edu',
-          message: `📦 Este Nido ha sido archivado y guardado en la sección de Nidos Completados e Historial.`,
+          message: `📦 ${state.currentUser.name} ha archivado este Nido en su historial personal.`,
           type: 'alert',
           timestamp: new Date().toISOString()
         });
@@ -1708,11 +1727,22 @@ async function archiveNido(nidoId) {
 async function unarchiveNido(nidoId) {
   try {
     if (typeof firebaseInitialized !== 'undefined' && firebaseInitialized && !state.offlineMode) {
-      await dbFirestore.collection('nidos').doc(nidoId).update({ archived: false });
+      const nidoDoc = await dbFirestore.collection('nidos').doc(nidoId).get();
+      if (nidoDoc.exists) {
+        const nidoData = nidoDoc.data();
+        let archivedBy = nidoData.archivedBy || [];
+        archivedBy = archivedBy.filter(email => email !== state.currentUser.email);
+        await dbFirestore.collection('nidos').doc(nidoId).update({ 
+          archivedBy: archivedBy,
+          archived: false // limpia el booleano global legado
+        });
+      }
     } else {
       const nido = state.nidos.find(n => n.id === nidoId);
       if (nido) {
-        nido.archived = false;
+        nido.archivedBy = nido.archivedBy || [];
+        nido.archivedBy = nido.archivedBy.filter(email => email !== state.currentUser.email);
+        nido.archived = false; // limpia el booleano global legado
         saveLocalState();
       }
     }
@@ -1732,6 +1762,22 @@ async function unarchiveNido(nidoId) {
     showToast('Error', 'No se pudo desarchivar.', 'danger');
   }
 }
+
+function toggleNidoOptionsDropdown(event) {
+  event.stopPropagation();
+  const menu = document.getElementById('nido-options-dropdown-menu');
+  if (menu) {
+    menu.classList.toggle('show');
+  }
+}
+
+// Close dropdown on click outside
+window.addEventListener('click', () => {
+  const menu = document.getElementById('nido-options-dropdown-menu');
+  if (menu && menu.classList.contains('show')) {
+    menu.classList.remove('show');
+  }
+});
 
 function renderNidoDetailView() {
   const panel = document.getElementById('panel-nidos');
@@ -1827,23 +1873,39 @@ function renderNidoDetailView() {
     titleEl.innerText = `Nido: ${nido.name}`;
   }
 
-  const backText = state.previousTab === 'history' ? '⬅ Volver a Historial' : '⬅ Volver a Nidos';
+  const isArchivedForMe = isNidoArchivedForUser(nido);
+  const backText = state.previousTab === 'history' ? '⬅ Volver' : '⬅ Volver';
+  const archiveText = isArchivedForMe ? '📤 Reactivar' : '📦 Archivar';
+  const archiveAction = isArchivedForMe ? `unarchiveNido('${nido.id}')` : `archiveNido('${nido.id}')`;
+  
+  let dropdownOptionsHtml = '';
+  if (nido.adminId === state.currentUser.id) {
+    dropdownOptionsHtml = `
+      <button class="nido-dropdown-item danger" onclick="confirmDeleteNido('${nido.id}')">
+        🗑️ Eliminar Nido
+      </button>
+    `;
+  } else {
+    dropdownOptionsHtml = `
+      <button class="nido-dropdown-item danger" onclick="confirmLeaveNido('${nido.id}')">
+        🚪 Salir del Nido
+      </button>
+    `;
+  }
+
   let headerButtonsHtml = `
     <button class="btn btn-secondary" onclick="exitNidoView()" style="padding:8px 16px; font-size:13px;">${backText}</button>
     <div class="nido-detail-actions-group">
+      <button class="btn btn-primary" onclick="${archiveAction}" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px; background: ${isArchivedForMe ? 'linear-gradient(135deg, #0d9488 0%, #0ea5e9 100%)' : 'linear-gradient(135deg, #0f4c81 0%, #0ea5e9 100%)'} !important;">${archiveText}</button>
+      
+      <div class="nido-options-dropdown">
+        <button class="btn btn-secondary btn-options-toggle" onclick="toggleNidoOptionsDropdown(event)">⋮</button>
+        <div class="nido-dropdown-menu" id="nido-options-dropdown-menu">
+          ${dropdownOptionsHtml}
+        </div>
+      </div>
+    </div>
   `;
-
-  if (nido.adminId === state.currentUser.id) {
-    if (nido.archived) {
-      headerButtonsHtml += `<button class="btn btn-primary" onclick="unarchiveNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px; background: linear-gradient(135deg, #0d9488 0%, #0ea5e9 100%) !important;">📤 Reactivar Nido</button>`;
-    } else {
-      headerButtonsHtml += `<button class="btn btn-primary" onclick="archiveNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px; background: linear-gradient(135deg, #0f4c81 0%, #0ea5e9 100%) !important;">📦 Archivar Nido</button>`;
-    }
-    headerButtonsHtml += `<button class="btn btn-danger" onclick="confirmDeleteNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">🗑️ Eliminar Nido</button>`;
-  } else {
-    headerButtonsHtml += `<button class="btn btn-danger" onclick="confirmLeaveNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">🚪 Salir del Nido</button>`;
-  }
-  headerButtonsHtml += `</div>`;
 
   panel.innerHTML = `
     <div class="nido-detail-header-bar">
