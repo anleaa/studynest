@@ -1830,13 +1830,13 @@ function renderNidoDetailView() {
   const backText = state.previousTab === 'history' ? '⬅ Volver a Historial' : '⬅ Volver a Nidos';
   let headerButtonsHtml = `
     <button class="btn btn-secondary" onclick="exitNidoView()" style="padding:8px 16px; font-size:13px;">${backText}</button>
-    <div style="display:flex; gap:8px; align-items:center;">
+    <div class="nido-detail-actions-group">
   `;
 
   if (nido.adminId === state.currentUser.id) {
     if (nido.archived) {
       headerButtonsHtml += `<button class="btn btn-primary" onclick="unarchiveNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px; background: linear-gradient(135deg, #0d9488 0%, #0ea5e9 100%) !important;">📤 Reactivar Nido</button>`;
-    } else if (pct === 100) {
+    } else {
       headerButtonsHtml += `<button class="btn btn-primary" onclick="archiveNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px; background: linear-gradient(135deg, #0f4c81 0%, #0ea5e9 100%) !important;">📦 Archivar Nido</button>`;
     }
     headerButtonsHtml += `<button class="btn btn-danger" onclick="confirmDeleteNido('${nido.id}')" style="padding:8px 16px; font-size:13px; display:inline-flex; align-items:center; gap:6px;">🗑️ Eliminar Nido</button>`;
@@ -1846,7 +1846,7 @@ function renderNidoDetailView() {
   headerButtonsHtml += `</div>`;
 
   panel.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px; width:100%;">
+    <div class="nido-detail-header-bar">
       ${headerButtonsHtml}
     </div>
     

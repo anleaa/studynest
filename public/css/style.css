@@ -2071,4 +2071,44 @@ button, input, textarea, select {
   }
 }
 
+/* ==========================================================================
+   NIDO DETAIL VIEW RESPONSIVE ACTIONS BAR
+   ========================================================================== */
+.nido-detail-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.nido-detail-actions-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .nido-detail-header-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .nido-detail-header-bar .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+  }
+  .nido-detail-actions-group {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 8px;
+  }
+}
+
 
