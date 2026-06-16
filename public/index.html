@@ -505,7 +505,7 @@
         <li class="sidebar-menu-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
           <a href="#">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-            Dashboard
+            Inicio
           </a>
         </li>
         <li class="sidebar-menu-item" data-tab="productivity" onclick="switchTab('productivity')">
@@ -586,6 +586,13 @@
                 <div id="dashboard-active-nidos">
                   <!-- Carga dinámica de Nidos -->
                 </div>
+                 
+                <div class="panel-header" style="margin-top: 30px; border-top: 1.5px dashed var(--color-border); padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+                  <h3 style="font-size:18px; font-weight:800; color:var(--color-emerald);">Mis Nidos Completados</h3>
+                </div>
+                <div id="dashboard-completed-nidos">
+                  <!-- Carga dinámica de Nidos Completados -->
+                </div>
               </div>
             </div>
 
@@ -664,6 +671,14 @@
                 <h3>Bloc de Notas Rápidas</h3>
                 <p style="font-size:11px; color:var(--color-text-muted); margin-bottom:10px;">Tus ideas se guardan al escribir.</p>
                 <textarea class="notepad-area" id="quick-notes-pad" placeholder="Escribe tus borradores de apuntes aquí..."></textarea>
+              </div>
+
+              <div class="glass-panel" style="margin-top: 20px;">
+                <h3 style="font-size:16px; font-weight:800; color:var(--color-emerald);">Nidos Completados</h3>
+                <p style="font-size:11px; color:var(--color-text-muted); margin-bottom:10px;">Historial de tus grupos terminados.</p>
+                <div id="productivity-completed-nidos" style="display: flex; flex-direction: column; gap: 8px;">
+                  <!-- Carga dinámica de Nidos Completados -->
+                </div>
               </div>
             </div>
           </div>

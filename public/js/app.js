@@ -1232,6 +1232,18 @@ function switchTab(tabId) {
     }
   }
 
+  // Controlar la visibilidad de la burbuja del chat flotante: SOLO en Inicio (Dashboard)
+  const chatWidget = document.getElementById('uni-chat-widget');
+  if (chatWidget) {
+    if (tabId === 'dashboard') {
+      if (state.currentUser) chatWidget.style.display = 'block';
+    } else {
+      chatWidget.style.display = 'none';
+      const chatPanel = document.getElementById('uni-chat-panel');
+      if (chatPanel) chatPanel.classList.remove('active');
+    }
+  }
+
   if (tabId === 'dashboard') {
     renderDashboardOverview();
     const gcPlaceholder = document.getElementById('global-chat-placeholder');
@@ -1247,6 +1259,7 @@ function switchTab(tabId) {
     }
   } else if (tabId === 'productivity') {
     renderKanban();
+    renderProductivityCompletedNidos();
   } else if (tabId === 'nidos') {
     renderNidosTab();
   } else if (tabId === 'alerts') {
@@ -1263,20 +1276,21 @@ function renderDashboardOverview() {
   const activeNidosList = document.getElementById('dashboard-active-nidos');
   if (activeNidosList) activeNidosList.innerHTML = '';
 
+  const completedNidosList = document.getElementById('dashboard-completed-nidos');
+  if (completedNidosList) completedNidosList.innerHTML = '';
+
   const activeNidos = state.nidos.filter(n => !n.archived);
+  const completedNidos = state.nidos.filter(n => n.archived);
 
-  if (activeNidos.length === 0) {
-    upcomingList.innerHTML = '<p class="text-secondary" style="font-size:13px;">No hay fechas límites próximas.</p>';
-    if (activeNidosList) activeNidosList.innerHTML = '<p class="text-secondary" style="font-size:13px;">Aún no perteneces a ningún Nido de estudio activo.</p>';
-    return;
-  }
-
+  // 1. Renderizar controles próximos (sólo para nidos activos)
+  let upcomingCount = 0;
   activeNidos.forEach(nido => {
     const compCount = nido.subtasks ? nido.subtasks.filter(s => s.completed).length : 0;
     const totalCount = nido.subtasks ? nido.subtasks.length : 0;
     const pct = totalCount > 0 ? Math.round((compCount / totalCount) * 100) : 0;
 
     if (nido.tentativeDeadline) {
+      upcomingCount++;
       const li = document.createElement('div');
       li.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid var(--color-border); font-size:13px;';
       li.innerHTML = `
@@ -1288,31 +1302,119 @@ function renderDashboardOverview() {
       `;
       upcomingList.appendChild(li);
     }
+  });
 
-    if (activeNidosList) {
-      const card = document.createElement('div');
-      card.className = 'glass-panel';
-      card.style.cssText = 'padding:16px; margin-bottom:12px; cursor:pointer;';
-      card.innerHTML = `
-        <h4 style="font-weight:700; color:var(--color-emerald);">${nido.name}</h4>
-        <p style="font-size:12px; color:var(--color-text-secondary); margin-bottom:8px;">${nido.subject} ${nido.code ? `• Código: <strong>${nido.code}</strong>` : ''}</p>
-        <div class="collective-progress-container" style="height:6px; margin-top:4px;">
-          <div class="collective-progress-bar" style="width:${pct}%"></div>
+  if (upcomingCount === 0) {
+    upcomingList.innerHTML = '<p class="text-secondary" style="font-size:13px;">No hay fechas límites próximas.</p>';
+  }
+
+  // 2. Renderizar Nidos Activos
+  if (activeNidos.length === 0) {
+    if (activeNidosList) activeNidosList.innerHTML = '<p class="text-secondary" style="font-size:13px; padding: 10px;">Aún no perteneces a ningún Nido de estudio activo.</p>';
+  } else {
+    activeNidos.forEach(nido => {
+      const compCount = nido.subtasks ? nido.subtasks.filter(s => s.completed).length : 0;
+      const totalCount = nido.subtasks ? nido.subtasks.length : 0;
+      const pct = totalCount > 0 ? Math.round((compCount / totalCount) * 100) : 0;
+
+      if (activeNidosList) {
+        const card = document.createElement('div');
+        card.className = 'glass-panel';
+        card.style.cssText = 'padding:16px; margin-bottom:12px; cursor:pointer;';
+        card.innerHTML = `
+          <h4 style="font-weight:700; color:var(--color-emerald);">${nido.name}</h4>
+          <p style="font-size:12px; color:var(--color-text-secondary); margin-bottom:8px;">${nido.subject} ${nido.code ? `• Código: <strong>${nido.code}</strong>` : ''}</p>
+          <div class="collective-progress-container" style="height:6px; margin-top:4px;">
+            <div class="collective-progress-bar" style="width:${pct}%"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:6px; color:var(--color-text-muted);">
+            <span>${nido.members ? nido.members.length : 1} Integrantes</span>
+            <span>${pct}% Completado</span>
+          </div>
+        `;
+        card.onclick = () => {
+          state.activeNido = nido;
+          switchTab('nidos');
+          subscribeToActiveNidoChats();
+          renderNidoDetailView();
+        };
+        activeNidosList.appendChild(card);
+      }
+    });
+  }
+
+  // 3. Renderizar Nidos Completados
+  if (completedNidosList) {
+    if (completedNidos.length === 0) {
+      completedNidosList.innerHTML = '<p class="text-secondary" style="font-size:13px; padding: 10px;">No tienes nidos completados o archivados todavía.</p>';
+    } else {
+      completedNidos.forEach(nido => {
+        const card = document.createElement('div');
+        card.className = 'glass-panel';
+        card.style.cssText = 'padding:16px; margin-bottom:12px; cursor:pointer; opacity: 0.85; border-color: rgba(15, 76, 129, 0.25) !important;';
+        card.innerHTML = `
+          <h4 style="font-weight:700; color:var(--color-text-muted); display:flex; align-items:center; gap:8px;">📦 ${nido.name} <span style="font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 8px; background-color: var(--color-emerald-light); color: var(--color-emerald);">Archivado</span></h4>
+          <p style="font-size:12px; color:var(--color-text-muted); margin-bottom:8px;">${nido.subject} ${nido.code ? `• Código: <strong>${nido.code}</strong>` : ''}</p>
+          <div class="collective-progress-container" style="height:6px; margin-top:4px;">
+            <div class="collective-progress-bar" style="width:100%; background: var(--color-text-muted);"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:6px; color:var(--color-text-muted);">
+            <span>${nido.members ? nido.members.length : 1} Integrantes</span>
+            <span>Completado 🏆</span>
+          </div>
+        `;
+        card.onclick = () => {
+          state.activeNido = nido;
+          switchTab('nidos');
+          subscribeToActiveNidoChats();
+          renderNidoDetailView();
+        };
+        completedNidosList.appendChild(card);
+      });
+    }
+  }
+}
+
+function renderProductivityCompletedNidos() {
+  const container = document.getElementById('productivity-completed-nidos');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const completedNidos = state.nidos.filter(n => n.archived);
+
+  if (completedNidos.length === 0) {
+    container.innerHTML = '<p class="text-secondary" style="font-size:12px; text-align:center; padding:10px;">No tienes nidos completados aún.</p>';
+  } else {
+    completedNidos.forEach(nido => {
+      const item = document.createElement('div');
+      item.style.cssText = 'background: rgba(255, 255, 255, 0.4); border: 1px solid var(--color-border); padding: 10px 14px; border-radius: var(--radius-sm); cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: var(--transition-fast);';
+      item.innerHTML = `
+        <div style="text-align: left;">
+          <strong style="font-size:13px; color: var(--color-text-primary); display:block;">📦 ${nido.name}</strong>
+          <span style="font-size:11px; color: var(--color-text-muted);">${nido.subject}</span>
         </div>
-        <div style="display:flex; justify-content:space-between; font-size:11px; margin-top:6px; color:var(--color-text-muted);">
-          <span>${nido.members ? nido.members.length : 1} Integrantes</span>
-          <span>${pct}% Completado</span>
-        </div>
+        <span style="font-size:11px; font-weight:700; color:var(--color-emerald);">100% 🏆</span>
       `;
-      card.onclick = () => {
+      item.onclick = () => {
         state.activeNido = nido;
         switchTab('nidos');
         subscribeToActiveNidoChats();
         renderNidoDetailView();
       };
-      activeNidosList.appendChild(card);
-    }
-  });
+      
+      // Efecto Hover
+      item.addEventListener('mouseenter', () => {
+        item.style.background = 'rgba(255, 255, 255, 0.6)';
+        item.style.transform = 'translateY(-1px)';
+      });
+      item.addEventListener('mouseleave', () => {
+        item.style.background = 'rgba(255, 255, 255, 0.4)';
+        item.style.transform = 'translateY(0)';
+      });
+
+      container.appendChild(item);
+    });
+  }
 }
 
 function renderGlobalChat() {
