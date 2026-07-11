@@ -1486,7 +1486,7 @@ function renderNidosTab() {
   if (!panel) return;
 
   if (!state.activeNido) {
-    const activeNidos = state.nidos.filter(n => !n.archived);
+    const activeNidos = state.nidos.filter(n => !isNidoArchivedForUser(n));
 
     let html = `
       <div class="panel-header">
@@ -1533,7 +1533,7 @@ function renderHistoryTab() {
   const panel = document.getElementById('panel-history');
   if (!panel) return;
 
-  const archivedNidos = state.nidos.filter(n => n.archived);
+  const archivedNidos = state.nidos.filter(n => isNidoArchivedForUser(n));
 
   let html = `
     <div class="panel-header">
